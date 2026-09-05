@@ -16,6 +16,8 @@
     "@doudou-start/airgate-theme": "https://github.com/DouDOU-start/airgate-sdk/releases/download/v0.2.1/airgate-theme-v0.2.1.tgz",
     "@fontsource/geist-mono": "^5.2.7",
     "@fontsource/geist-sans": "^5.2.5",
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "@fontsource/ibm-plex-sans": "5.3.0",
     "@heroui/react": "^3.0.3",
     "@heroui/styles": "^3.0.3",
     "@internationalized/date": "^3.12.1",

@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { settingsApi } from '../../shared/api/settings';
 import { queryKeys } from '../../shared/queryKeys';
 import { getOriginSite, subscribeOriginSite } from '../../shared/originSite';
+import { applyBrand, resolveBrand } from '../../shared/brand';
 import { mergeLegacyNotification, parseNotificationHistory, type SiteNotification } from '../../shared/notifications';
 import defaultLogoUrl from '../../assets/logo.svg';
 
@@ -173,6 +174,19 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     link.href = logoHref;
     document.title = value.site_name || defaults.site_name;
   }, [value.site_logo, value.site_name]);
+
+  // 站点设置返回后按来源站 / 站名复算品牌,写到 <html data-brand>:
+  // 品牌皮肤(styles/brand-hopbase.css)只对 hopbase 生效,ToC 品牌不受影响。
+  // 未返回前沿用启动时的临时品牌,避免默认值把 ToC 实例误判成 HopBase。
+  useEffect(() => {
+    if (!value.settings_loaded) return;
+    applyBrand(resolveBrand({
+      siteId: value.site_id,
+      siteName: value.site_name,
+      brandLabel: value.site_brand_label,
+      logo: value.site_logo,
+    }));
+  }, [value.settings_loaded, value.site_id, value.site_name, value.site_brand_label, value.site_logo]);
 
   return (
     <SiteSettingsContext.Provider value={value}>

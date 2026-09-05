@@ -1,0 +1,190 @@
+/* ==========================================================================
+   02b. HopBase 品牌 token 覆盖层
+   ----------------------------------------------------------------------------
+   设计源头是官网 landing/assets/landing.css:纸面层次 + 发丝线 + 零投影,橙色只做强调。
+   SDK(@doudou-start/airgate-theme)在运行时以 `:root[data-theme="…"]` 注入默认的
+   中性灰 --ag-* token,且不接受自定义主题;本文件用更高特异性的
+   `:root[data-brand="hopbase"][data-theme="…"]` 覆盖,不依赖样式注入顺序。
+   `data-brand` 由 shared/brand.ts 写到 <html>,Essevin / kite 等 ToC 品牌不命中。
+
+   浅色 = 官网纸面调色板原值;深色 = 官网终端面板的暖炭色,不再用中性灰。
+   语义色为浅色补了可读版本,深色用终端里已有的灰绿 / 橙。
+   ========================================================================== */
+
+/* ---------- 与主题无关的静态 token:字体、圆角 ---------- */
+:root[data-brand="hopbase"] {
+  --ag-font-sans: "IBM Plex Sans", "Noto Sans SC", system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --ag-font-mono: "IBM Plex Mono", "SF Mono", Menlo, Consolas, monospace;
+
+  /* 官网控件 4px、面板 6px;不再有 8–24px 的大圆角。
+     HeroUI 组件按 --radius 的倍数取圆角(按钮/卡片/弹层 ×3,徽记 ×2,提示 ×1.5),
+     所以基数取 2px:容器 6px、按钮 6px、徽记 4px、提示 3px,一个 token 全部压平。 */
+  --ag-radius-sm: 2px;
+  --ag-radius-md: 4px;
+  --ag-radius-lg: 6px;
+  --ag-radius-xl: 6px;
+  --ag-field-radius: 4px;
+  --radius: 2px;
+  --field-radius: 4px;
+
+  /* Tailwind rounded-* 尺度一并压平(theme 层声明在 @layer 内,此处未分层即可覆盖) */
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 6px;
+  --radius-2xl: 6px;
+  --radius-3xl: 6px;
+  --radius-4xl: 8px;
+
+  /* 官网的强调色永远是橙:焦点环、文本选中 */
+  --focus: #e2600f;
+}
+
+/* ---------- 浅色:纸面 ---------- */
+:root[data-brand="hopbase"][data-theme="light"],
+:root[data-brand="hopbase"]:not([data-theme="dark"]) {
+  --ag-bg: #f2f2f0;
+  --ag-bg-deep: #f2f2f0;
+  --ag-bg-surface: #fbfbfa;
+  --ag-bg-elevated: #fbfbfa;
+  --ag-bg-hover: #f4f4f2;
+  --ag-bg-active: #ecece9;
+
+  --ag-surface: #fbfbfa;
+  --ag-surface-foreground: #0b0d0c;
+  --ag-surface-secondary: #f4f4f2;
+  --ag-surface-secondary-foreground: #0b0d0c;
+  --ag-surface-tertiary: #ecece9;
+  --ag-surface-tertiary-foreground: #0b0d0c;
+  --ag-overlay: #fbfbfa;
+  --ag-overlay-foreground: #0b0d0c;
+  --ag-default-bg: #f4f4f2;
+  --ag-default-foreground: #0b0d0c;
+  --ag-segment: #fbfbfa;
+  --ag-segment-foreground: #0b0d0c;
+
+  --ag-field-background: #fbfbfa;
+  --ag-field-foreground: #0b0d0c;
+  --ag-field-placeholder: #7f847a;
+
+  --ag-border: #c8c8c2;
+  --ag-border-subtle: #e0e0dc;
+  --ag-border-focus: #e2600f;
+  --ag-glass: rgba(251, 251, 250, 0.92);
+  --ag-glass-border: #e0e0dc;
+  --ag-scrollbar: #c8c8c2;
+
+  --ag-text: #0b0d0c;
+  --ag-text-secondary: #4a4f49;
+  --ag-text-tertiary: #666c60;
+  --ag-text-inverse: #f6f6f2;
+  --ag-muted: #666c60;
+
+  /* 主按钮 = 墨色实心;橙色只在 subtle / glow(选中、焦点)出现 */
+  --ag-primary: #0b0d0c;
+  --ag-primary-foreground: #f6f6f2;
+  --ag-primary-hover: #2a2d28;
+  --ag-primary-subtle: #fdf0e6;
+  --ag-primary-glow: rgba(226, 96, 15, 0.22);
+  --ag-info: #1769aa;
+  --ag-info-subtle: rgba(23, 105, 170, 0.12);
+
+  --ag-success: #2f7d4f;
+  --ag-success-foreground: #ffffff;
+  --ag-success-subtle: #e8f3ec;
+  --ag-warning: #b7791f;
+  --ag-warning-foreground: #ffffff;
+  --ag-warning-subtle: #fbf1dc;
+  --ag-danger: #b3261e;
+  --ag-danger-foreground: #ffffff;
+  --ag-danger-subtle: #fbe9e7;
+
+  /* 零投影:面板靠发丝线分层;弹层保留一层极淡投影 */
+  --ag-shadow-sm: none;
+  --ag-shadow-md: none;
+  --ag-shadow-lg: 0 12px 28px rgba(11, 13, 12, 0.10);
+  --ag-shadow-glow: 0 0 0 1px rgba(226, 96, 15, 0.25);
+  --surface-shadow: none;
+  --field-shadow: none;
+  --overlay-shadow: 0 12px 28px rgba(11, 13, 12, 0.10);
+  --backdrop: rgba(11, 13, 12, 0.42);
+}
+
+/* ---------- 深色:官网终端面板的暖炭 ---------- */
+:root[data-brand="hopbase"][data-theme="dark"] {
+  --ag-bg: #14150f;
+  --ag-bg-deep: #0f100b;
+  --ag-bg-surface: #1a1b15;
+  --ag-bg-elevated: #1a1b15;
+  --ag-bg-hover: #21231c;
+  --ag-bg-active: #2a2c25;
+
+  --ag-surface: #1a1b15;
+  --ag-surface-foreground: #f2f3ec;
+  --ag-surface-secondary: #21231c;
+  --ag-surface-secondary-foreground: #f2f3ec;
+  --ag-surface-tertiary: #2a2c25;
+  --ag-surface-tertiary-foreground: #f2f3ec;
+  --ag-overlay: #1a1b15;
+  --ag-overlay-foreground: #f2f3ec;
+  --ag-default-bg: #21231c;
+  --ag-default-foreground: #f2f3ec;
+  --ag-segment: #2a2c25;
+  --ag-segment-foreground: #f2f3ec;
+
+  --ag-field-background: #1a1b15;
+  --ag-field-foreground: #f2f3ec;
+  --ag-field-placeholder: #5f6659;
+
+  --ag-border: #363930;
+  --ag-border-subtle: #262922;
+  --ag-border-focus: #ff9b4f;
+  --ag-glass: rgba(26, 27, 21, 0.92);
+  --ag-glass-border: #262922;
+  --ag-scrollbar: #3a3d36;
+
+  --ag-text: #f2f3ec;
+  --ag-text-secondary: #c9cec1;
+  --ag-text-tertiary: #8b9184;
+  --ag-text-inverse: #14150f;
+  --ag-muted: #8b9184;
+
+  --ag-primary: #f2f3ec;
+  --ag-primary-foreground: #14150f;
+  --ag-primary-hover: #d9ddd2;
+  --ag-primary-subtle: rgba(255, 155, 79, 0.13);
+  --ag-primary-glow: rgba(255, 155, 79, 0.25);
+  --ag-info: #7fb4e6;
+  --ag-info-subtle: rgba(127, 180, 230, 0.14);
+
+  --ag-success: #9fc7a6;
+  --ag-success-foreground: #14150f;
+  --ag-success-subtle: rgba(159, 199, 166, 0.14);
+  --ag-warning: #e0b25a;
+  --ag-warning-foreground: #14150f;
+  --ag-warning-subtle: rgba(224, 178, 90, 0.14);
+  --ag-danger: #e57368;
+  --ag-danger-foreground: #14150f;
+  --ag-danger-subtle: rgba(229, 115, 104, 0.14);
+
+  --ag-shadow-sm: none;
+  --ag-shadow-md: none;
+  --ag-shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.35);
+  --ag-shadow-glow: 0 0 0 1px rgba(255, 155, 79, 0.3);
+  --surface-shadow: none;
+  --field-shadow: none;
+  --overlay-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  --backdrop: rgba(0, 0, 0, 0.62);
+  --focus: #ff9b4f;
+}
+
+/* 官网正文不压字距;深浅切换只过渡颜色不过渡布局 */
+:root[data-brand="hopbase"] body {
+  letter-spacing: 0;
+}
+
+:root[data-brand="hopbase"] ::selection {
+  background: var(--ag-primary-subtle);
+  color: var(--ag-text);
+}
