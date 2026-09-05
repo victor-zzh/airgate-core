@@ -73,6 +73,14 @@ func (f *Forwarder) resolveModelFamily(platform, model string) string {
 // maxFailoverAttempts 最大 failover 次数（账号级失败后切换新账号上游调用的上限）。
 const maxFailoverAttempts = 3
 
+// 同账号重试：分组里已没有其它候选（单供给，或备用也都被排除）时，若上一次失败是
+// 网络抖动类瞬时故障（连接被重置 / EOF / 秒回 5xx），原地在同一账号再试一次，
+// 而不是把错误吐给客户端。延迟给上游一个极短的恢复窗口；上游给了 Retry-After 则照用但封顶。
+const (
+	sameAccountRetryDelay    = 800 * time.Millisecond
+	sameAccountRetryMaxDelay = 3 * time.Second
+)
+
 // queueWaitTimeout 所有账号 slot 都被占满时，请求最多排队等多久再放弃。
 // 1 分钟对号池小 / 并发高的场景能把毛刺吸收掉；超过这个时长意味着号池真的不够用。
 const queueWaitTimeout = 60 * time.Second
@@ -203,6 +211,11 @@ func (f *Forwarder) Forward(c *gin.Context) {
 		queueDeadline := time.Now().Add(queueWaitTimeout)
 		queuePollDelay := queuePollInterval
 		waitingForLocalCapacity := false
+		// 同账号重试每条路由只给一次；lastSoftFailure 记住最近一次"账号无辜"的失败，
+		// 供穷尽后判断值不值得原地再试。
+		sameAccountRetried := false
+		var lastSoftFailure *forwardExecution
+		lastSoftFailureAccount := 0
 
 		for attempt < maxFailoverAttempts {
 			if status := canceledRequestStatus(ctx.Err()); status != 0 {
@@ -262,6 +275,29 @@ func (f *Forwarder) Forward(c *gin.Context) {
 						if queuePollDelay > queueMaxPollInterval {
 							queuePollDelay = queueMaxPollInterval
 						}
+					}
+					continue
+				}
+				if !sameAccountRetried && lastSoftFailure != nil && isUnclassifiedSelectionExhaustion(err) && sameAccountRetryable(*lastSoftFailure) {
+					sameAccountRetried = true
+					softExclude = removeAccountID(softExclude, lastSoftFailureAccount)
+					delay := sameAccountRetryDelayFor(lastSoftFailure.outcome.RetryAfter)
+					logger.Warn("forward_same_account_retry",
+						sdk.LogFieldAccountID, lastSoftFailureAccount,
+						"kind", lastSoftFailure.outcome.Kind,
+						sdk.LogFieldReason, judgmentReason(*lastSoftFailure),
+						"delay_ms", delay.Milliseconds(),
+						"attempt", attempt,
+					)
+					if !waitBeforeRetry(ctx, delay) {
+						if status := canceledRequestStatus(ctx.Err()); status != 0 {
+							f.recordCanceledRequest(c, state, status, false)
+							logger.Debug("forward_request_canceled",
+								"status_code", status,
+								"attempts", totalAttempts,
+							)
+						}
+						return
 					}
 					continue
 				}
@@ -416,6 +452,9 @@ func (f *Forwarder) Forward(c *gin.Context) {
 					hardExclude = append(hardExclude, accountID)
 				} else {
 					softExclude = append(softExclude, accountID)
+					failed := execution
+					lastSoftFailure = &failed
+					lastSoftFailureAccount = accountID
 				}
 				continue
 			}
@@ -990,6 +1029,58 @@ func streamAbortRetryable(c *gin.Context) bool {
 // 唯独 504 网关超时执行结果未知，禁止在其它账号上重放。
 func replayableClientError(outcome sdk.ForwardOutcome) bool {
 	return outcome.Upstream.StatusCode != http.StatusGatewayTimeout
+}
+
+// sameAccountRetryable 判定一次失败是否值得在同一账号上原地再试（仅当已无其它候选）。
+// 目标是网络抖动类瞬时失败：连接被重置 / EOF / 秒回 5xx / 插件自身出错——账号无过错，
+// 换不到号时与其把错误吐给客户端，不如再试一次。排除：
+//   - 账号级过错（限流 / 死信）与客户端错误：原地重试必然复现；
+//   - 超时类（上游 504、首字/停滞守卫断开、context deadline）：上游已经跑满一轮，
+//     原地重跑只会让客户端等待翻倍，且大概率再次超时。
+func sameAccountRetryable(execution forwardExecution) bool {
+	kind := execution.outcome.Kind
+	if kind.IsAccountFault() || kind == sdk.OutcomeClientError || kind == sdk.OutcomeSuccess {
+		return false
+	}
+	if isTimeoutFailure(execution) || strings.Contains(judgmentReason(execution), "超时") {
+		return false
+	}
+	return kind == sdk.OutcomeUpstreamTransient || kind == sdk.OutcomeStreamAborted || execution.err != nil
+}
+
+func sameAccountRetryDelayFor(retryAfter time.Duration) time.Duration {
+	if retryAfter <= 0 {
+		return sameAccountRetryDelay
+	}
+	if retryAfter > sameAccountRetryMaxDelay {
+		return sameAccountRetryMaxDelay
+	}
+	return retryAfter
+}
+
+func removeAccountID(ids []int, id int) []int {
+	out := make([]int, 0, len(ids))
+	for _, v := range ids {
+		if v != id {
+			out = append(out, v)
+		}
+	}
+	return out
+}
+
+// waitBeforeRetry 等待 d 后返回 true；请求上下文先结束则返回 false。
+func waitBeforeRetry(ctx context.Context, d time.Duration) bool {
+	if d <= 0 {
+		return ctx.Err() == nil
+	}
+	timer := time.NewTimer(d)
+	defer timer.Stop()
+	select {
+	case <-ctx.Done():
+		return false
+	case <-timer.C:
+		return true
+	}
 }
 
 // callPlugin 把请求发给插件。
