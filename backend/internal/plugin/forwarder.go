@@ -1032,17 +1032,13 @@ func replayableClientError(outcome sdk.ForwardOutcome) bool {
 }
 
 // sameAccountRetryable 判定一次失败是否值得在同一账号上原地再试（仅当已无其它候选）。
-// 目标是网络抖动类瞬时失败：连接被重置 / EOF / 秒回 5xx / 插件自身出错——账号无过错，
-// 换不到号时与其把错误吐给客户端，不如再试一次。排除：
-//   - 账号级过错（限流 / 死信）与客户端错误：原地重试必然复现；
-//   - 超时类（上游 504、首字/停滞守卫断开、context deadline）：上游已经跑满一轮，
-//     原地重跑只会让客户端等待翻倍，且大概率再次超时。
+// 凡是"账号无过错"的失败都算：连接被重置 / EOF / 5xx / 上游 504 / 首字或停滞守卫断开 /
+// 插件自身出错——换不到号时与其把错误吐给客户端，不如再试一次（用户拍板：兜住错误优先，
+// 超时类也要重试；代价是客户端等待可能翻倍，客户端自己先放弃时 ctx 结束、重试即刻停止）。
+// 只排除原地重试必然复现的两类：账号级过错（限流 / 死信）与客户端错误。
 func sameAccountRetryable(execution forwardExecution) bool {
 	kind := execution.outcome.Kind
 	if kind.IsAccountFault() || kind == sdk.OutcomeClientError || kind == sdk.OutcomeSuccess {
-		return false
-	}
-	if isTimeoutFailure(execution) || strings.Contains(judgmentReason(execution), "超时") {
 		return false
 	}
 	return kind == sdk.OutcomeUpstreamTransient || kind == sdk.OutcomeStreamAborted || execution.err != nil
