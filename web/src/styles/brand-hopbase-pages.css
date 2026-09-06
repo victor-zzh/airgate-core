@@ -811,3 +811,39 @@
 [data-brand="hopbase"] .select__trigger > svg {
   flex-shrink: 0;
 }
+
+/* ---------- 开关:选中态用墨色,不用绿色(设计标准 §4)。
+   变量声明在 .ag-native-switch 自身,必须同层覆盖,挂 :root 压不过 ---------- */
+[data-brand="hopbase"] .ag-native-switch {
+  --ag-native-switch-checked-track: var(--foreground);
+  --ag-native-switch-checked-track-border: var(--foreground);
+  --ag-native-switch-checked-thumb: var(--surface);
+}
+
+/* ---------- 通知级别:分段器风格(浅底 + 橙色下划线),黑填充只留给主按钮 ---------- */
+[data-brand="hopbase"] .ag-level-option.button {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--ag-text-secondary);
+  font-weight: 500;
+}
+
+[data-brand="hopbase"] .ag-level-option.button:hover {
+  border-color: var(--foreground);
+  color: var(--foreground);
+  background: transparent;
+}
+
+[data-brand="hopbase"] .ag-level-option.button[data-selected="true"] {
+  border-color: var(--foreground);
+  background: var(--surface-secondary);
+  color: var(--foreground);
+  box-shadow: inset 0 -2px 0 var(--hb-accent);
+  font-weight: 600;
+}
+
+/* ---------- 通知历史:行间发丝线,时间戳与正文左对齐 ---------- */
+[data-brand="hopbase"] .ag-notice-history article {
+  border-bottom-color: var(--separator);
+}
