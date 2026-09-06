@@ -156,6 +156,16 @@
    在 1156px 的可视区里明显偏右;这时没有数据行,表头压缩到容器宽度即可 */
 .ag-usage-records-table:has(.empty-state) .ag-usage-table,
 .ag-usage-records-table:has([aria-busy="true"]) .ag-usage-table {
+  /* 表格是 table-layout:fixed + 各列定宽,总宽远超容器;空态 / 加载态没有数据行,
+     这时放开列宽让表格收到容器宽度,否则占位内容按 2000+px 的表宽居中,看起来偏右 */
   min-width: 0 !important;
-  width: 100%;
+  width: 100% !important;
+  table-layout: auto !important;
+}
+
+.ag-usage-records-table:has(.empty-state) .ag-usage-table :where(th, [data-slot="th"]),
+.ag-usage-records-table:has([aria-busy="true"]) .ag-usage-table :where(th, [data-slot="th"]) {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
 }
