@@ -271,7 +271,7 @@ export default function TeamPage() {
                 <CommonTable.Row id={String(row.id)} key={row.id}>
                   <CommonTable.Cell>
                     <div className="min-w-0">
-                      <div className="truncate font-medium text-text">{row.name}</div>
+                      <div className="ag-cell-2line font-medium text-text">{row.name}</div>
                       {row.email ? (
                         <div className="truncate text-xs text-text-tertiary" title={row.email}>{row.email}</div>
                       ) : null}

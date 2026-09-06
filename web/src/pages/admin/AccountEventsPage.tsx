@@ -275,7 +275,7 @@ export default function AccountEventsPage() {
                 <CommonTable.Cell>
                   <span className="inline-flex max-w-[11.5rem] items-center gap-1.5">
                     <PlatformIcon platform={row.platform} className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate font-medium" style={{ color: 'var(--ag-text)' }} title={row.account_name}>
+                    <span className="ag-cell-2line font-medium" style={{ color: 'var(--ag-text)' }} title={row.account_name}>
                       {row.account_name}
                     </span>
                   </span>

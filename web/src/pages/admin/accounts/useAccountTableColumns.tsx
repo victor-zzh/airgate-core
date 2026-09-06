@@ -81,13 +81,13 @@ export function useAccountTableColumns({
     {
       key: 'name',
       title: t('common.name'),
-      width: '132px',
-      mobileWidth: '112px',
+      width: '176px',
+      mobileWidth: '132px',
       render: (row) => {
         const email = row.credentials?.email;
         return (
           <div className="flex w-full min-w-0 flex-col items-center text-center">
-            <span style={{ color: 'var(--ag-text)' }} className="max-w-full truncate font-medium" title={row.name}>
+            <span style={{ color: 'var(--ag-text)' }} className="ag-cell-2line max-w-full font-medium" title={row.name}>
               {row.name}
             </span>
             {email && (
@@ -102,15 +102,15 @@ export function useAccountTableColumns({
     {
       key: 'platform',
       title: t('accounts.platform_type'),
-      width: '96px',
-      mobileWidth: '84px',
+      width: '112px',
+      mobileWidth: '92px',
       render: (row) => {
         const PluginAccountIdentity = getPluginAccountIdentity(row.platform);
         return (
           <div className="flex w-full min-w-0 flex-col items-center gap-1 text-center">
             <span className="inline-flex max-w-full min-w-0 items-center justify-center gap-1">
               <PlatformIcon platform={row.platform} className="w-3.5 h-3.5" />
-              <span className="min-w-0 truncate">{platformName(row.platform)}</span>
+              <span className="ag-cell-2line min-w-0">{platformName(row.platform)}</span>
             </span>
             {PluginAccountIdentity ? (
               <PluginAccountIdentity
