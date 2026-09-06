@@ -602,8 +602,9 @@ export default function ModelPlazaPage() {
           <div className="ag-model-category-tabs" aria-label={t('model_plaza.category_filter')} role="group">
             <Button
               aria-pressed={categoryFilter === 'all'}
+              data-selected={categoryFilter === 'all'}
               size="sm"
-              variant={categoryFilter === 'all' ? 'primary' : 'secondary'}
+              variant="ghost"
               onPress={() => selectCategory('all')}
             >
               {t('common.all')}
@@ -612,8 +613,9 @@ export default function ModelPlazaPage() {
               <Button
                 key={key}
                 aria-pressed={categoryFilter === key}
+                data-selected={categoryFilter === key}
                 size="sm"
-                variant={categoryFilter === key ? 'primary' : 'secondary'}
+                variant="ghost"
                 onPress={() => selectCategory(key)}
               >
                 {t(`model_plaza.category_${key}`, key)}
@@ -626,8 +628,9 @@ export default function ModelPlazaPage() {
               <Button
                 key={vendor}
                 aria-pressed={vendorFilter === vendor}
+                data-selected={vendorFilter === vendor}
                 size="sm"
-                variant={vendorFilter === vendor ? 'primary' : 'secondary'}
+                variant="ghost"
                 onPress={() => setVendorFilter(vendor)}
               >
                 {vendor === 'all' ? t('model_plaza.vendor_all') : t(`model_plaza.vendor_${vendor}`, vendor)}
@@ -750,8 +753,9 @@ export default function ModelPlazaPage() {
                       </td>
                       {/* 收起态刻意不展示价格：同系列各版本价差很大，给单一数字会误导。 */}
                       <td data-label={t('model_plaza.series_price_hint')}>
-                        <Button size="sm" variant="secondary" onPress={() => toggleSeries(group.key)}>
+                        <Button className="ag-model-series-expand" size="sm" variant="ghost" onPress={() => toggleSeries(group.key)}>
                           {expanded ? t('model_plaza.series_collapse') : t('model_plaza.series_expand')}
+                          {expanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
                         </Button>
                       </td>
                     </tr>
