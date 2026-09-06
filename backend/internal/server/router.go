@@ -385,6 +385,17 @@ func (s *Server) registerRoutes() {
 	// 实现见 cc_compat.go。
 	r.GET("/v1/usage", s.handleCCCompatUserBalance)
 
+	// === OneAPI / NewAPI 余额查询兼容端点（同样 sk-xxx API Key 自鉴权） ===
+	// 下游中转与路由器沿用 OpenAI 早期的 billing 端点探测额度，且必须成对读取：
+	// remaining = subscription.hard_limit_usd - usage.total_usage/100。
+	// 我方 /v1/usage 是 cc-switch 口径、字段名不同，下游认不出来，只能持续吃 404。
+	// 裸路径（不带 /v1）一并注册：部分实现直接按 baseUrl 拼 /dashboard/...。
+	// 同样必须注册在 NoRoute 之前，否则会被插件动态路由吃掉。实现见 oneapi_compat.go。
+	for _, prefix := range []string{"/v1", ""} {
+		r.GET(prefix+"/dashboard/billing/subscription", s.handleOneAPIBillingSubscription)
+		r.GET(prefix+"/dashboard/billing/usage", s.handleOneAPIBillingUsage)
+	}
+
 	// === MCP 管理面（Streamable HTTP，无状态，sk-xxx API Key 自鉴权） ===
 	// 只读工具：余额 / Key 配额 / 可用模型与实付价 / 用量统计。
 	// 必须注册在 NoRoute 之前，否则会被插件动态路由吃掉。实现见 handler/mcp_handler_routes.go。
