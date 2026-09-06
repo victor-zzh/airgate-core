@@ -1127,7 +1127,7 @@ func (h *HostService) reportAccountResult(ctx context.Context, req hostReportAcc
 
 // forward 非流式业务转发：调度 → 网关 → 计费 → 记录。
 // 与 probeForward 的区别：走完整计费管线，不跳过 usage_log / 余额扣款。
-// 账号级故障自动 failover，最多 maxHostForwardAttempts 次。
+// 账号级故障自动 failover，直到当前路由的候选账号耗尽。
 func (h *HostService) forward(ctx context.Context, req hostForwardRequest) (map[string]interface{}, error) {
 	if req.UserID <= 0 {
 		return nil, status.Error(codes.InvalidArgument, "user_id 必须 > 0")
@@ -1166,7 +1166,7 @@ func (h *HostService) forward(ctx context.Context, req hostForwardRequest) (map[
 	fwdCtx, cancel := context.WithTimeout(ctx, hostForwardTimeout(h.manager, req))
 	defer cancel()
 
-	hardExclude := make([]int, 0, maxHostForwardAttempts*len(routes))
+	hardExclude := make([]int, 0, len(routes))
 	var lastUpstream sdk.UpstreamResponse
 	hasLastUpstream := false
 	// 回放上游 4xx 体时要按「当时那个账号」剥供应商标识，账号在循环外已不可见，随快照一起捕获。
@@ -1191,12 +1191,12 @@ func (h *HostService) forward(ctx context.Context, req hostForwardRequest) (map[
 			continue
 		}
 
-		softExclude := make([]int, 0, maxHostForwardAttempts)
+		softExclude := make([]int, 0, 8)
 		attempt := 0
 		queueDeadline := time.Now().Add(hostForwardCapacityWaitTimeout)
 		queuePollDelay := hostForwardCapacityPollInterval
 		waitingForLocalCapacity := false
-		for attempt < maxHostForwardAttempts {
+		for {
 			exclude := make([]int, 0, len(hardExclude)+len(softExclude))
 			exclude = append(exclude, hardExclude...)
 			exclude = append(exclude, softExclude...)
@@ -1559,7 +1559,7 @@ func (h *HostService) forwardStream(ctx context.Context, req hostForwardRequest,
 	defer cancel()
 
 	sw := &hostStreamWriter{stream: stream}
-	hardExclude := make([]int, 0, maxHostForwardAttempts*len(routes))
+	hardExclude := make([]int, 0, len(routes))
 	failureSummary := allRoutesFailureSummary{}
 	// 与 Forwarder 一致：4xx 判决也换号重试，穷尽后回放最后一次客户端错误。
 	var lastClientError *sdk.ForwardOutcome
@@ -1579,12 +1579,12 @@ func (h *HostService) forwardStream(ctx context.Context, req hostForwardRequest,
 			continue
 		}
 
-		softExclude := make([]int, 0, maxHostForwardAttempts)
+		softExclude := make([]int, 0, 8)
 		attempt := 0
 		queueDeadline := time.Now().Add(hostForwardCapacityWaitTimeout)
 		queuePollDelay := hostForwardCapacityPollInterval
 		waitingForLocalCapacity := false
-		for attempt < maxHostForwardAttempts {
+		for {
 			exclude := make([]int, 0, len(hardExclude)+len(softExclude))
 			exclude = append(exclude, hardExclude...)
 			exclude = append(exclude, softExclude...)
@@ -1770,9 +1770,7 @@ func (h *HostService) forwardStream(ctx context.Context, req hostForwardRequest,
 	return sendHostStreamFailure(stream, failureSummary)
 }
 
-// maxHostForwardAttempts 最大 failover 次数，与 Forwarder 保持一致。
 const (
-	maxHostForwardAttempts = 3
 	// 长任务走直连入口时不受 Cloudflare 代理超时限制；为官方模型和大上下文请求
 	// 保留足够的单次转发时间，仍由客户端取消或上游自身超时提前结束。
 	defaultHostForwardTimeout          = 30 * time.Minute
