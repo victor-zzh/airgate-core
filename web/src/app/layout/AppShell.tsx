@@ -372,6 +372,9 @@ export function AppShell({ children }: AppShellProps) {
                     preload={false}
                     data-active={active ? 'true' : undefined}
                     className={`ag-sidebar-nav-item group relative flex items-center transition-colors duration-150 ${sidebarCollapsed ? 'mx-auto h-10 w-10 justify-center p-0' : 'px-2 py-1.5'}`}
+                    // 鼠标点导航不夺焦点:否则弹层关闭把焦点还回来时,全局 :focus-visible 会给活动项套一圈橙框
+                    // (与左侧橙线成了两套选中样式);键盘 Tab 仍能聚焦并显示焦点环。
+                    onMouseDown={(event) => event.preventDefault()}
                   >
                     <span className="flex shrink-0 items-center justify-center">{item.icon}</span>
                     {!sidebarCollapsed && (
