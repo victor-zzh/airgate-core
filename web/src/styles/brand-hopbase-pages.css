@@ -401,3 +401,209 @@
   flex: 1;
   justify-content: center;
 }
+
+/* ---------- 模型广场:标题行 + 一行筛选(下划线分类 tab / 厂商芯片)+ 账本表 ---------- */
+[data-brand="hopbase"] .ag-model-plaza-header {
+  border-bottom-color: var(--separator);
+  padding: 0 0 0.875rem;
+}
+
+[data-brand="hopbase"] .ag-model-plaza-header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+[data-brand="hopbase"] .ag-model-plaza-header p {
+  font-size: 0.8125rem;
+}
+
+[data-brand="hopbase"] .ag-model-plaza-count strong {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+[data-brand="hopbase"] .ag-model-filter-rail {
+  gap: 0.625rem 0.75rem;
+  border: 0;
+  border-bottom: 1px solid var(--separator);
+  border-radius: 0;
+  background: var(--background);
+  box-shadow: none;
+  padding: 0.25rem 0 0.75rem;
+  backdrop-filter: none;
+}
+
+[data-brand="hopbase"] .ag-model-search {
+  flex: 0 1 18rem;
+}
+
+[data-brand="hopbase"] .ag-model-search-input {
+  min-height: 2rem;
+  height: 2rem;
+  font-size: 0.8125rem;
+}
+
+/* 分类:下划线 tab,选中 = 墨色字 + 橙色指示条 */
+[data-brand="hopbase"] .ag-model-category-tabs {
+  flex: 1 1 auto;
+  gap: 0;
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+[data-brand="hopbase"] .ag-model-category-tabs .button {
+  min-height: 2rem;
+  height: 2rem;
+  padding: 0 0.75rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ag-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+[data-brand="hopbase"] .ag-model-category-tabs .button:hover {
+  color: var(--foreground);
+  background: transparent;
+}
+
+[data-brand="hopbase"] .ag-model-category-tabs .button[data-selected="true"] {
+  color: var(--foreground);
+  border-bottom-color: var(--hb-accent);
+}
+
+[data-brand="hopbase"] .ag-model-tab-count {
+  border-radius: var(--radius);
+  background: var(--surface-secondary);
+  color: var(--muted);
+  font-family: var(--ag-font-mono);
+  font-size: 0.6875rem;
+  padding: 0 0.3125rem;
+}
+
+/* 厂商:发丝线芯片,选中 = 浅底 + 墨色描边 */
+[data-brand="hopbase"] .ag-model-filter-group {
+  flex: 1 1 100%;
+  gap: 0.375rem;
+}
+
+[data-brand="hopbase"] .ag-model-filter-group .button {
+  min-height: 1.75rem;
+  height: 1.75rem;
+  padding: 0 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--ag-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+[data-brand="hopbase"] .ag-model-filter-group .button:hover {
+  border-color: var(--foreground);
+  color: var(--foreground);
+  background: transparent;
+}
+
+[data-brand="hopbase"] .ag-model-filter-group .button[data-selected="true"] {
+  border-color: var(--foreground);
+  background: var(--surface-secondary);
+  color: var(--foreground);
+}
+
+[data-brand="hopbase"] .ag-model-capability-filter {
+  font-weight: 500;
+}
+
+[data-brand="hopbase"] .ag-model-capability-filter select {
+  min-height: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius);
+  font-size: 0.75rem;
+  padding-right: 1.5rem;
+}
+
+[data-brand="hopbase"] .ag-model-stat-strip {
+  border-block-color: var(--separator);
+  font-size: 0.75rem;
+}
+
+/* 账本表:发丝线、系列行浅底、子行只缩进不画竖线 */
+[data-brand="hopbase"] .ag-model-ledger {
+  border: 1px solid var(--border);
+  border-radius: var(--console-radius-lg);
+  box-shadow: none;
+}
+
+[data-brand="hopbase"] .ag-model-ledger th,
+[data-brand="hopbase"] .ag-model-ledger td {
+  border-bottom-color: var(--separator);
+  padding: 0.75rem 1rem;
+}
+
+[data-brand="hopbase"] .ag-model-ledger th {
+  background: transparent;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+[data-brand="hopbase"] .ag-model-ledger tbody tr:hover {
+  background: var(--surface-secondary);
+}
+
+[data-brand="hopbase"] .ag-model-series-row td {
+  background: var(--surface-secondary);
+}
+
+[data-brand="hopbase"] .ag-model-series-toggle {
+  padding-inline: 0.25rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+[data-brand="hopbase"] .ag-model-series-expand {
+  color: var(--ag-text-secondary);
+  font-weight: 500;
+}
+
+[data-brand="hopbase"] .ag-model-series-child td:first-child {
+  padding-left: 2.25rem;
+  border-left: 0;
+  box-shadow: none;
+}
+
+[data-brand="hopbase"] .ag-model-series-child td {
+  background: transparent;
+}
+
+[data-brand="hopbase"] .ag-model-id-spine {
+  border-left: 0;
+  padding-left: 0;
+}
+
+[data-brand="hopbase"] .ag-model-id-spine code {
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+[data-brand="hopbase"] .ag-model-copy.button {
+  width: 1.75rem;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  min-height: 1.75rem;
+  flex-basis: 1.75rem;
+  color: var(--muted);
+}
+
+[data-brand="hopbase"] .ag-model-price-grid dd {
+  font-weight: 500;
+}
+
+[data-brand="hopbase"] .ag-model-state-panel {
+  border-radius: var(--console-radius-lg);
+  box-shadow: none;
+}
