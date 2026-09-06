@@ -623,20 +623,17 @@ export default function ModelPlazaPage() {
               </Button>
             ))}
           </div>
-          <div className="ag-model-filter-group" aria-label={t('model_plaza.vendor_filter')} role="group">
-            {['all', ...vendors].map((vendor) => (
-              <Button
-                key={vendor}
-                aria-pressed={vendorFilter === vendor}
-                data-selected={vendorFilter === vendor}
-                size="sm"
-                variant="ghost"
-                onPress={() => setVendorFilter(vendor)}
-              >
-                {vendor === 'all' ? t('model_plaza.vendor_all') : t(`model_plaza.vendor_${vendor}`, vendor)}
-              </Button>
-            ))}
-          </div>
+          <label className="ag-model-capability-filter">
+            <span>{t('model_plaza.vendor_filter')}</span>
+            <select value={vendorFilter} onChange={(event) => setVendorFilter(event.target.value)}>
+              <option value="all">{t('model_plaza.vendor_all')}</option>
+              {vendors.map((vendor) => (
+                <option key={vendor} value={vendor}>
+                  {t(`model_plaza.vendor_${vendor}`, vendor)}
+                </option>
+              ))}
+            </select>
+          </label>
           <label className="ag-model-capability-filter">
             <span>{t('model_plaza.platform_filter')}</span>
             <select value={platformFilter} onChange={(event) => setPlatformFilter(event.target.value)}>
@@ -662,11 +659,17 @@ export default function ModelPlazaPage() {
         </div>
       ) : null}
 
-      {!isLoading && !isError ? (
+      {/* 统计条只在筛选生效或价格口径需要提示时出现:总数已在标题行,不重复 */}
+      {!isLoading && !isError && (filteredModels.length !== models.length || personalPricingFallback || pricingFallback) ? (
         <div className="ag-model-stat-strip" aria-live="polite">
-          <span>{t('model_plaza.stat_all')} <strong>{models.length}</strong></span>
-          <span>{t('model_plaza.stat_results')} <strong>{filteredModels.length}</strong></span>
-          <span>{t('model_plaza.stat_vendors')} <strong>{vendors.length}</strong></span>
+          {filteredModels.length !== models.length ? (
+            <>
+              <span>{t('model_plaza.stat_results')} <strong>{filteredModels.length}</strong> / {models.length}</span>
+              <span>
+                <Button size="sm" variant="ghost" onPress={clearFilters}>{t('model_plaza.clear_filters')}</Button>
+              </span>
+            </>
+          ) : null}
           {personalPricingFallback ? (
             <span className="ag-model-price-fallback">{t('model_plaza.personal_price_notice')}</span>
           ) : pricingFallback ? (

@@ -1846,6 +1846,8 @@
     "input_hint": "Enter para enviar, Shift+Enter para salto de línea",
     "platform": "Plataforma",
     "model": "Modelo",
+    "model_search": "Buscar modelos",
+    "model_no_match": "No hay modelos que coincidan",
     "tokens_in": "Entrada",
     "tokens_out": "Salida",
     "cost": "Costo",

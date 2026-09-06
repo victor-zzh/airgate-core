@@ -14,7 +14,6 @@ import { getTotalPages } from '../../shared/utils/pagination';
 import { TablePaginationFooter } from '../../shared/components/TablePaginationFooter';
 import { TableLoadingRow } from '../../shared/components/TableLoadingRow';
 import { CommonTable } from '../../shared/components/CommonTable';
-import { MetricChips } from '../../shared/components/MetricChips';
 import {
   Ban,
   CheckCircle,
@@ -275,7 +274,7 @@ export default function TeamPage() {
                         <div className="truncate text-xs text-text-tertiary" title={row.email}>{row.email}</div>
                       ) : null}
                       {!row.has_account ? (
-                        <div className="text-xs text-warning" title={t('team.no_account_hint')}>{t('team.no_account')}</div>
+                        <span className="ag-member-tag" title={t('team.no_account_hint')}>{t('team.no_account')}</span>
                       ) : null}
                       {row.note ? (
                         <div className="truncate text-xs text-text-tertiary" title={row.note}>{row.note}</div>
@@ -286,25 +285,18 @@ export default function TeamPage() {
                     <StatusChip status={row.status} />
                   </CommonTable.Cell>
                   <CommonTable.Cell>
-                    <div className="space-y-1">
-                      <MetricChips
-                        className="ag-metric-chips--quota"
-                        items={[
-                          {
-                            amount: row.period_used,
-                            color: pct >= 90 ? 'danger' : 'warning',
-                            highlightDollar: true,
-                            label: t('team.period_used'),
-                          },
-                          {
-                            amount: unlimited ? undefined : row.quota_usd,
-                            color: 'success',
-                            label: t('user_keys.quota_total_short', 'Total'),
-                            value: '∞',
-                          },
-                        ]}
-                      />
-                      <div className="text-xs text-text-tertiary">
+                    {/* 额度:一行「已用 / 总额」+ 细进度条 + 周期说明,替代两枚彩色徽记 */}
+                    <div className="ag-quota-cell">
+                      <div className="ag-quota-cell-line">
+                        <b>${row.period_used.toFixed(2)}</b>
+                        <span>/ {unlimited ? '∞' : `$${row.quota_usd.toFixed(2)}`}</span>
+                      </div>
+                      {!unlimited ? (
+                        <div className="ag-quota-bar" aria-hidden="true">
+                          <i data-tone={pct >= 90 ? 'danger' : pct >= 70 ? 'warning' : undefined} style={{ width: `${pct}%` }} />
+                        </div>
+                      ) : null}
+                      <div className="ag-quota-cell-meta">
                         {row.quota_period === 'monthly'
                           ? t('team.period_ends', { date: formatDate(row.period_end) })
                           : t('team.period_none')}
@@ -319,21 +311,18 @@ export default function TeamPage() {
                     </span>
                   </CommonTable.Cell>
                   <CommonTable.Cell>
-                    <MetricChips
-                      className="ag-metric-chips--stack"
-                      items={[
-                        { amount: row.today_cost, color: 'default', label: t('team.usage_today'), mutedWhenZero: true },
-                        { amount: row.thirty_day_cost, color: 'default', label: t('team.usage_30d'), mutedWhenZero: true },
-                        // 累计取 used_quota_actual：主账号为该成员实际付出的金额，与今日/30 天同基准；
-                        // 上面额度列的「本期已用」是账面口径(受 sell_rate 影响)，两者刻意不混。
-                        { amount: row.used_quota_actual, color: 'default', label: t('team.cumulative'), mutedWhenZero: true },
-                      ]}
-                    />
+                    {/* 用量:一行三段,零值弱化;累计取 used_quota_actual(主账号实付,与今日 / 30 天同基准),
+                        与额度列的「本期已用」(账面口径,受 sell_rate 影响)刻意不混 */}
+                    <span className="ag-usage-line">
+                      <span>{t('team.usage_today')}</span><b data-zero={row.today_cost === 0}>${row.today_cost.toFixed(2)}</b>
+                      <span>{t('team.usage_30d')}</span><b data-zero={row.thirty_day_cost === 0}>${row.thirty_day_cost.toFixed(2)}</b>
+                      <span>{t('team.cumulative')}</span><b data-zero={row.used_quota_actual === 0}>${row.used_quota_actual.toFixed(2)}</b>
+                    </span>
                   </CommonTable.Cell>
                   <CommonTable.Cell>
                     <Button
                       size="sm"
-                      variant="outline"
+                      variant="ghost"
                       onPress={() => navigate({ to: '/keys', search: { member_id: row.id } })}
                     >
                       <KeyRound className="h-3.5 w-3.5" />
