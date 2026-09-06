@@ -125,6 +125,8 @@
   --ag-border: var(--hb-rule);
   --ag-border-subtle: var(--hb-hair);
   --ag-border-focus: var(--hb-accent);
+  /* 插件侧的强调色(会话 / 项目列表的当前项橙点等):cssVar('accent') */
+  --ag-accent: var(--hb-accent);
   --ag-glass: rgba(251, 251, 250, 0.92);
   --ag-glass-border: var(--hb-hair);
   --ag-scrollbar: var(--hb-rule);
@@ -213,6 +215,8 @@
   --ag-border: var(--hb-rule);
   --ag-border-subtle: var(--hb-hair);
   --ag-border-focus: var(--hb-accent);
+  /* 插件侧的强调色(会话 / 项目列表的当前项橙点等):cssVar('accent') */
+  --ag-accent: var(--hb-accent);
   --ag-glass: rgba(26, 27, 21, 0.92);
   --ag-glass-border: var(--hb-hair);
   --ag-scrollbar: #3a3d36;

@@ -7,7 +7,6 @@ import {
 } from '@tanstack/react-router';
 import { Suspense, useEffect } from 'react';
 import type { ElementType, ReactNode } from 'react';
-import type { PluginBreadcrumbItem } from '../shared/components/PluginBreadcrumbs';
 import { useAuth } from './providers/AuthProvider';
 import { OnboardingRoot } from './onboarding/OnboardingRoot';
 import { ErrorBoundary } from './providers/ErrorBoundary';
@@ -77,15 +76,6 @@ function redirectToLogin() {
 
 const AppShell = lazyWithPreload<{ children: ReactNode }>(() =>
   import('./layout/AppShell').then((m) => ({ default: m.AppShell })),
-);
-const PluginShell = lazyWithPreload<{
-  children: ReactNode;
-  pluginName?: string;
-  titleKey?: string;
-  titleFallback?: string;
-  breadcrumbs?: PluginBreadcrumbItem[];
-}>(() =>
-  import('./layout/PluginShell').then((m) => ({ default: m.PluginShell })),
 );
 
 function RoutePreloader() {
@@ -357,7 +347,8 @@ const teamRoute = createRoute({
 const userUsageRoute = createRoute({ getParentRoute: () => authLayout, path: '/usage', component: renderPage(UserUsagePage) });
 const modelPlazaRoute = createRoute({ getParentRoute: () => authLayout, path: '/models', component: renderPage(ModelPlazaPage) });
 
-// /chat: 全屏沉浸式 AI 对话页（airgate-playground 插件），独立布局不挂 AppShell。
+// /chat: AI 对话页(airgate-playground 插件)。挂在控制台壳层下:顶栏与账户区由 AppShell 提供,
+// 侧栏在该路由自动收成 56px 图标栏,插件自己的会话栏成为唯一展开的左栏;页面本身 data-full-bleed。
 // 仍要求登录 + 安装完成；走 PluginShell 通用插件顶栏。
 const chatBeforeLoad = () => withSetupCheck((needs) => {
   if (needs) throw redirect({ to: '/setup' });
@@ -365,28 +356,19 @@ const chatBeforeLoad = () => withSetupCheck((needs) => {
   if (getTokenRole() === 'api_key') throw redirect({ to: '/' });
 });
 const chatRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authLayout,
   path: '/chat',
   beforeLoad: chatBeforeLoad,
   component: () => (
     <Suspense fallback={<ChatPageLoading />}>
-      <PluginShell
-        pluginName="airgate-playground"
-        titleKey="plugin_shell.playground_title"
-        titleFallback="AI Chat"
-        breadcrumbs={[
-          { to: '/', labelKey: 'plugin_shell.console', labelFallback: 'Console' },
-          { labelKey: 'plugin_shell.playground_title', labelFallback: 'AI Chat' },
-        ]}
-      >
-        <PluginPage pluginNameOverride="airgate-playground" subPathOverride="/chat" />
-      </PluginShell>
+      <PluginPage pluginNameOverride="airgate-playground" subPathOverride="/chat" />
     </Suspense>
   ),
 });
-// /studio: 创作中心（airgate-studio 插件），独立全屏布局。
+// /studio: 创作工作坊(airgate-studio 插件)。同 /chat 挂在控制台壳层下并收成图标栏;
+// 插件当前仍是 position:fixed 的全屏布局,会盖在壳层之上,待插件改成 in-flow + data-full-bleed 后即嵌入壳层。
 const studioRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authLayout,
   path: '/studio',
   beforeLoad: chatBeforeLoad,
   component: () => (
@@ -430,8 +412,6 @@ const routeTree = rootRoute.addChildren([
   userAgreementLegacyRoute,
   privacyPolicyRoute,
   privacyPolicyLegacyRoute,
-  studioRoute,
-  chatRoute,
   playgroundLegacyRoute,
   authLayout.addChildren([
     dashboardRoute,
@@ -462,6 +442,8 @@ const routeTree = rootRoute.addChildren([
     teamRoute,
     userUsageRoute,
     modelPlazaRoute,
+    chatRoute,
+    studioRoute,
     pluginRoute,
   ]),
 ]);

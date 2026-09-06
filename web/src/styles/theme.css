@@ -236,3 +236,8 @@
   --chart-token-cache-creation: #f59e0b;
   --chart-token-cache-ratio: #c084fc;
 }
+
+/* 强调色:非 HopBase 品牌回落到主色;插件经 cssVar('accent') 取用 */
+:root {
+  --ag-accent: var(--ag-primary);
+}

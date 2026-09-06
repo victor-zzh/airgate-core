@@ -304,7 +304,7 @@ const META_CHIP_EFFORT_COLORS: Record<string, string> = {
   xhigh: META_CHIP_XHIGH_COLOR,
 };
 
-const MODEL_META_SLOT_WIDTH_CLASS = 'w-[4.5rem]';
+const MODEL_META_SLOT_WIDTH_CLASS = 'w-[5.5rem]';
 
 function MetaChip({
   color,
@@ -780,7 +780,7 @@ export function useUsageColumns(opts?: { customerScope?: boolean; adminView?: bo
     {
       key: 'model',
       title: t('usage.model_or_operation', 'Model / Operation'),
-      width: '240px',
+      width: '250px',
       render: (row) => {
         const assetOperation = isAssetUsageOperation(row);
         const model = resolvedUsageModel(row);
@@ -828,7 +828,7 @@ export function useUsageColumns(opts?: { customerScope?: boolean; adminView?: bo
         })();
 
         return (
-          <div className="grid w-full min-w-0 grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-3 text-left">
+          <div className="grid w-full min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-2 text-left">
             <div className={`ag-usage-model-meta-slot ${MODEL_META_SLOT_WIDTH_CLASS} flex h-4 shrink-0 items-center justify-center overflow-hidden`}>
               {PluginUsageModelMeta ? (
                 <PluginUsageModelMeta
