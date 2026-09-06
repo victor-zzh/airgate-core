@@ -187,7 +187,7 @@ function MetricCard({
 
 function StatsSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4 2xl:gap-4">
+    <div className="ag-stats-grid grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4 2xl:gap-4">
       {Array.from({ length: 8 }).map((_, index) => (
         <Card className="ag-dashboard-metric min-h-[72px] 2xl:min-h-[78px]" key={index}>
           <Card.Content className="ag-dashboard-metric-content p-3 2xl:p-3.5">
@@ -211,7 +211,7 @@ function StatsCards({ stats }: { stats: DashboardStatsResp }) {
   const todayImageRequests = stats.today_image_requests ?? 0;
   const todayTextRequests = Math.max(0, (stats.today_requests ?? 0) - todayImageRequests);
   return (
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4 2xl:gap-4">
+    <div className="ag-stats-grid grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4 2xl:gap-4">
       <MetricCard
         icon={<KeyRound className="h-5 w-5" />}
         tone="blue"

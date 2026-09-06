@@ -2,7 +2,7 @@ import { type ReactNode, useEffect, useMemo, useState } from 'react';
 import { Link, useMatchRoute, useRouterState } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useIsFetching, useQuery } from '@tanstack/react-query';
-import { Button, Link as HeroLink, Tooltip } from '@heroui/react';
+import { Button, Dropdown, Link as HeroLink, Tooltip } from '@heroui/react';
 import { useAuth } from '../providers/AuthProvider';
 import { getTokenRole } from '../../shared/api/client';
 import { pluginsApi } from '../../shared/api/plugins';
@@ -53,6 +53,7 @@ import {
   Tags,
   Link2,
   UsersRound,
+  ChevronsUpDown,
 } from 'lucide-react';
 
 interface AppShellProps {
@@ -263,6 +264,16 @@ export function AppShell({ children }: AppShellProps) {
 
   // 团队成员的密钥会话优先显示成员名，其次才是密钥名
   const displayName = user?.member_name || user?.api_key_name || user?.username || user?.email?.split('@')[0] || site.site_name || 'HopBase';
+  const accountInitial = (user?.username || user?.email || 'U').charAt(0).toUpperCase();
+  // 普通会话显示邮箱;团队成员的密钥会话显示「团队成员」;非成员的密钥会话不露任何身份
+  const accountSubline = isAdmin
+    ? t('nav.admin')
+    : (isAPIKeySession ? (user?.member_name ? t('auth.apikey_member_badge') : '') : (user?.email ?? ''));
+  const accountMenuItems = [
+    ...(!isAPIKeySession ? [{ id: 'guide', label: t('onboarding.sidebar_label'), icon: <Route className="h-3.5 w-3.5" /> }] : []),
+    { id: 'docs', label: t('nav.docs'), icon: <BookOpen className="h-3.5 w-3.5" /> },
+    { id: 'logout', label: t('common.logout'), icon: <LogOut className="h-3.5 w-3.5" /> },
+  ];
   const notificationIdentity = isAPIKeySession
     ? `api-key:${user?.api_key_id ?? 'session'}`
     : `user:${user?.id ?? 'session'}`;
@@ -275,7 +286,7 @@ export function AppShell({ children }: AppShellProps) {
 
   const sidebarContent = (
     <>
-      <div className="flex h-20 items-center px-4">
+      <div className="ag-sidebar-brand flex h-12 items-center px-4">
         <div className={`flex min-w-0 ${sidebarCollapsed ? 'w-full justify-center' : 'w-full items-center gap-3'}`}>
           <SiteBrand
             className={sidebarCollapsed ? 'text-text' : 'min-w-0 flex-1 text-text'}
@@ -316,7 +327,7 @@ export function AppShell({ children }: AppShellProps) {
         {sections.map((section, si) => (
           <div key={si}>
             {section.titleKey && !sidebarCollapsed && (
-              <p className="px-2.5 pb-2 text-[10px] font-medium uppercase text-text-tertiary">
+              <p className="ag-sidebar-section-label px-2.5 pb-2 text-[10px] font-medium uppercase text-text-tertiary">
                 {t(section.titleKey)}
               </p>
             )}
@@ -361,63 +372,48 @@ export function AppShell({ children }: AppShellProps) {
         ))}
       </nav>
 
-      <div className="space-y-1 border-t border-border p-3">
-        {!isAPIKeySession && !sidebarCollapsed && (
-          <Button
-            data-onboarding-replay="true"
-            className="w-full justify-center"
-            size="sm"
-            variant="ghost"
-            onPress={() => {
-              openGuide();
-              setMobileOpen(false);
-            }}
+      <div className="ag-sidebar-footer border-t border-border-subtle p-2">
+        <Dropdown>
+          <Dropdown.Trigger
+            aria-label={displayName}
+            className={`ag-account-row ${sidebarCollapsed ? 'ag-account-row--mini' : ''}`}
           >
-            <Route className="h-4 w-4" />
-            {t('onboarding.sidebar_label')}
-          </Button>
-        )}
-        {!isAPIKeySession && !isMobile && sidebarCollapsed && (
-          <Tooltip>
-            <Tooltip.Trigger className="block w-full">
-              <Button
-                data-onboarding-replay="true"
-                aria-label={t('onboarding.sidebar_label')}
-                className="w-full"
-                isIconOnly
-                size="sm"
-                variant="ghost"
-                onPress={openGuide}
-              >
-                <Route className="h-4 w-4" />
-              </Button>
-            </Tooltip.Trigger>
-            <Tooltip.Content>{t('onboarding.sidebar_label')}</Tooltip.Content>
-          </Tooltip>
-        )}
-        {!sidebarCollapsed && (
-          <Button
-            className="w-full justify-center"
-            size="sm"
-            variant="ghost"
-            onPress={() => { window.location.href = effectiveDocUrl(site.doc_url).href; }}
-          >
-            <HelpCircle className="h-4 w-4" />
-            {t('nav.docs')}
-          </Button>
-        )}
-        {!isMobile && sidebarCollapsed && (
-          <Button
-            aria-label={t('nav.docs')}
-            className="w-full"
-            isIconOnly
-            size="sm"
-            variant="ghost"
-            onPress={() => { window.location.href = effectiveDocUrl(site.doc_url).href; }}
-          >
-            <HelpCircle className="h-4 w-4" />
-          </Button>
-        )}
+            <span aria-hidden="true" className="ag-account-avatar">
+              {isAdmin ? <ShieldCheck className="h-3.5 w-3.5" /> : accountInitial}
+            </span>
+            {!sidebarCollapsed && (
+              <span className="ag-account-copy">
+                <span className="ag-account-name">{displayName}</span>
+                <span className="ag-account-sub">{accountSubline}</span>
+              </span>
+            )}
+            {!sidebarCollapsed && <ChevronsUpDown aria-hidden="true" className="ag-account-caret h-3.5 w-3.5" />}
+          </Dropdown.Trigger>
+          <Dropdown.Popover placement={sidebarCollapsed ? 'right bottom' : 'top start'}>
+            <Dropdown.Menu
+              aria-label={t('common.more')}
+              onAction={(key) => {
+                if (key === 'guide') {
+                  openGuide();
+                  setMobileOpen(false);
+                } else if (key === 'docs') {
+                  window.location.href = effectiveDocUrl(site.doc_url).href;
+                } else if (key === 'logout') {
+                  logout();
+                }
+              }}
+            >
+              {accountMenuItems.map((item) => (
+                <Dropdown.Item className={item.id === 'logout' ? 'text-danger' : undefined} id={item.id} key={item.id} textValue={item.label}>
+                  <span className="flex items-center gap-2">
+                    {item.icon}
+                    {item.label}
+                  </span>
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown.Popover>
+        </Dropdown>
       </div>
     </>
   );
@@ -471,21 +467,6 @@ export function AppShell({ children }: AppShellProps) {
           </div>
 
           <div className="flex shrink-0 items-center gap-2">
-            <NotificationCenter key={notificationIdentity} identity={notificationIdentity} />
-            {/* Docs：未配置外部链接时回退到内置 /docs */}
-            {(() => {
-              const docs = effectiveDocUrl(site.doc_url);
-              return (
-                <HeroLink
-                  href={docs.href}
-                  {...(docs.isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                  aria-label={t('nav.docs')}
-                  className="hidden h-10 w-10 items-center justify-center rounded-[var(--radius)] text-text-secondary transition-colors hover:text-text sm:flex"
-                >
-                  <BookOpen className="h-5 w-5" />
-                </HeroLink>
-              );
-            })()}
             {/* Contact */}
             {site.contact_info && (
               <div className="hidden items-center gap-2 text-text-tertiary lg:flex">
@@ -506,44 +487,36 @@ export function AppShell({ children }: AppShellProps) {
             >
               {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
+            {/* Docs：未配置外部链接时回退到内置 /docs */}
+            {(() => {
+              const docs = effectiveDocUrl(site.doc_url);
+              return (
+                <HeroLink
+                  href={docs.href}
+                  {...(docs.isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                  aria-label={t('nav.docs')}
+                  className="hidden h-10 w-10 items-center justify-center rounded-[var(--radius)] text-text-secondary transition-colors hover:text-text sm:flex"
+                >
+                  <BookOpen className="h-5 w-5" />
+                </HeroLink>
+              );
+            })()}
+            {/* 帮助与引导:从侧栏底部挪到顶栏,与文档并列 */}
+            {!isAPIKeySession && (
+              <Button
+                data-onboarding-replay="true"
+                aria-label={t('onboarding.sidebar_label')}
+                className="hidden h-10 w-10 sm:flex"
+                isIconOnly
+                size="sm"
+                variant="ghost"
+                onPress={openGuide}
+              >
+                <HelpCircle className="h-5 w-5" />
+              </Button>
+            )}
+            <NotificationCenter key={notificationIdentity} identity={notificationIdentity} />
 
-            <div className="mx-1.5 hidden h-6 w-px bg-border sm:block" />
-
-            <div className="hidden items-center gap-2.5 pl-1 sm:flex">
-              {/* 普通会话显示用户名+邮箱；团队成员的密钥会话显示成员名+「团队成员」，非成员的密钥会话仍不露任何身份 */}
-              {(!isAPIKeySession || user?.member_name) && (
-                <div className="hidden text-right md:block">
-                  <p className="text-sm font-medium leading-tight text-text">
-                    {displayName}
-                  </p>
-                  <p className="text-xs leading-tight text-text-tertiary">
-                    {isAPIKeySession ? t('auth.apikey_member_badge') : user?.email}
-                  </p>
-                </div>
-              )}
-              {isAdmin ? (
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius)] text-primary">
-                  <ShieldCheck className="h-5 w-5" />
-                </div>
-              ) : (
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius)] text-sm font-bold text-primary">
-                  {(user?.username || user?.email || 'U').charAt(0).toUpperCase()}
-                </div>
-              )}
-            </div>
-
-            {/* Logout button */}
-            <div className="mx-1 hidden h-6 w-px bg-border sm:block" />
-            <Button
-              aria-label={t('common.logout')}
-              className="h-10 w-10 text-text-secondary hover:bg-danger/10 hover:text-danger"
-              isIconOnly
-              size="sm"
-              variant="ghost"
-              onPress={logout}
-            >
-              <LogOut className="h-5 w-5" />
-            </Button>
           </div>
         </header>
 
