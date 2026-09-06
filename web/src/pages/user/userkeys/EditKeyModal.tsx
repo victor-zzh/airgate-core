@@ -166,16 +166,29 @@ export function EditKeyModal({
             <Description>{t('user_keys.member_hint')}</Description>
           </Select>
         ) : null}
-        <HeroTextField fullWidth>
-          <Label>{t('user_keys.quota_label')}</Label>
-          <Input
-            type="number"
-            value={form.quota_usd}
-            onChange={(e) => setForm({ ...form, quota_usd: e.target.value })}
-            placeholder={t('user_keys.quota_unlimited_hint')}
-          />
-          <Description>{t('user_keys.quota_hint')}</Description>
-        </HeroTextField>
+        {/* 配额与并发并排,售价倍率单独一行:同一弹窗少滚一屏 */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <HeroTextField fullWidth>
+            <Label>{t('user_keys.quota_label')}</Label>
+            <Input
+              type="number"
+              value={form.quota_usd}
+              onChange={(e) => setForm({ ...form, quota_usd: e.target.value })}
+              placeholder={t('user_keys.quota_unlimited_hint')}
+            />
+            <Description>{t('user_keys.quota_hint')}</Description>
+          </HeroTextField>
+          <HeroTextField fullWidth>
+            <Label>{t('user_keys.max_concurrency_label', 'Maximum concurrency')}</Label>
+            <Input
+              type="number"
+              value={form.max_concurrency}
+              onChange={(e) => setForm({ ...form, max_concurrency: e.target.value })}
+              placeholder="0"
+            />
+            <Description>{t('user_keys.max_concurrency_hint', 'Leave blank or set to 0 for no limit')}</Description>
+          </HeroTextField>
+        </div>
         <HeroTextField fullWidth>
           <Label>{t('user_keys.sell_rate_label', 'Selling multiplier (customer price)')}</Label>
           <Input
@@ -185,16 +198,6 @@ export function EditKeyModal({
             placeholder="0"
           />
           <Description>{t('user_keys.sell_rate_hint', 'Leave blank or set to 0 to bill at the platform list price')}</Description>
-        </HeroTextField>
-        <HeroTextField fullWidth>
-          <Label>{t('user_keys.max_concurrency_label', 'Maximum concurrency')}</Label>
-          <Input
-            type="number"
-            value={form.max_concurrency}
-            onChange={(e) => setForm({ ...form, max_concurrency: e.target.value })}
-            placeholder="0"
-          />
-          <Description>{t('user_keys.max_concurrency_hint', 'Leave blank or set to 0 for no limit')}</Description>
         </HeroTextField>
         <CommonDatePicker
           description={t('user_keys.expire_hint')}

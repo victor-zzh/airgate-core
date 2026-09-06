@@ -1846,6 +1846,8 @@
     "input_hint": "Enter で送信、Shift+Enter で改行",
     "platform": "プラットフォーム",
     "model": "モデル",
+    "model_search": "モデルを検索",
+    "model_no_match": "一致するモデルがありません",
     "tokens_in": "入力",
     "tokens_out": "出力",
     "cost": "費用",

@@ -1846,6 +1846,8 @@
     "input_hint": "Enter 發送，Shift+Enter 換行",
     "platform": "平台",
     "model": "模型",
+    "model_search": "搜尋模型",
+    "model_no_match": "沒有匹配的模型",
     "tokens_in": "輸入",
     "tokens_out": "輸出",
     "cost": "費用",

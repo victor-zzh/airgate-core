@@ -1846,6 +1846,8 @@
     "input_hint": "Enter to send, Shift+Enter for newline",
     "platform": "Platform",
     "model": "Model",
+    "model_search": "Search models",
+    "model_no_match": "No matching models",
     "tokens_in": "In",
     "tokens_out": "Out",
     "cost": "Cost",
