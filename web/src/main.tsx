@@ -16,6 +16,7 @@ import { ToastProvider, useToast } from './shared/ui';
 import { DialogTriggerShim } from './shared/components/DialogTriggerShim';
 import { router } from './app/router';
 import { captureOriginSite } from './shared/originSite';
+import { applyProvisionalBrand } from './shared/brand';
 import { captureInviteCode } from './shared/inviteCode';
 import { captureAuthReturnTo } from './shared/authReturnTo';
 import { tryReloadForStaleChunk } from './shared/chunkReload';
@@ -24,6 +25,8 @@ import './index.css';
 
 // 尽早捕获落地页来源参数（?site=/?ref=）与分销邀请码（?inv=），保证任意入口路由都不漏归因。
 captureOriginSite();
+// 首屏品牌:决定 <html data-brand>,品牌皮肤与主题默认值都依赖它;站点设置返回后会复算。
+applyProvisionalBrand();
 captureInviteCode();
 captureAuthReturnTo();
 

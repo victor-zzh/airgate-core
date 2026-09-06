@@ -99,14 +99,14 @@ export function PluginBreadcrumbs({
               <Link
                 to={item.to}
                 preload={false}
-                className="shrink-0 rounded-[var(--radius)] px-1.5 py-1 text-text-tertiary transition-colors hover:bg-bg-hover hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="shrink-0 rounded-[var(--radius)] px-1.5 py-1 text-text-tertiary transition-colors hover:bg-bg-hover hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
               >
                 {label}
               </Link>
             ) : item.href && !isLast ? (
               <a
                 href={item.href}
-                className="shrink-0 rounded-[var(--radius)] px-1.5 py-1 text-text-tertiary no-underline transition-colors hover:bg-bg-hover hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="shrink-0 rounded-[var(--radius)] px-1.5 py-1 text-text-tertiary no-underline transition-colors hover:bg-bg-hover hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
               >
                 {label}
               </a>

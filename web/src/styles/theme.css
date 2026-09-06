@@ -27,6 +27,17 @@
   /* HeroUI radius preset */
   --radius: 0.25rem;
   --field-radius: 0.5rem;
+  /* Tailwind rounded-* 尺度:HeroUI 在 @theme inline 里把 --radius-* 写成 calc(var(--radius) * N)
+     并被内联进工具类,运行时改不了;这里经 --console-radius-* 二次桥接(默认值 = HeroUI 原尺度),
+     品牌覆盖层改这组变量即可整体压平圆角。 */
+  --console-radius-xs: calc(var(--radius) * 0.25);
+  --console-radius-sm: calc(var(--radius) * 0.5);
+  --console-radius-md: calc(var(--radius) * 0.75);
+  --console-radius-lg: calc(var(--radius) * 1);
+  --console-radius-xl: calc(var(--radius) * 1.5);
+  --console-radius-2xl: calc(var(--radius) * 2);
+  --console-radius-3xl: calc(var(--radius) * 3);
+  --console-radius-4xl: calc(var(--radius) * 4);
   --ag-font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   --ag-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Monaco, "Courier New", monospace;
   --font-geist: var(--ag-font-sans);
@@ -170,22 +181,32 @@
   --color-info-subtle: var(--ag-info-subtle);
 
   --color-bg: var(--background);
-  --color-bg-deep: var(--background);
+  --color-bg-deep: var(--ag-bg-deep);
   --color-bg-elevated: var(--overlay);
   --color-bg-surface: var(--surface);
-  --color-bg-hover: color-mix(in oklab, var(--default) 82%, var(--background) 18%);
-  --color-bg-active: color-mix(in oklab, var(--default) 72%, var(--foreground) 8%);
+  --color-bg-hover: var(--ag-bg-hover);
+  --color-bg-active: var(--ag-bg-active);
 
   --color-border-subtle: var(--separator);
   --color-border-focus: var(--focus);
 
   --color-text: var(--foreground);
-  --color-text-secondary: color-mix(in oklab, var(--foreground) 74%, var(--muted) 26%);
+  --color-text-secondary: var(--ag-text-secondary);
   --color-text-tertiary: var(--muted);
   --color-text-inverse: var(--accent-foreground);
 
   --color-glass: var(--ag-glass);
   --color-glass-border: var(--ag-glass-border);
+
+  /* ── Radius(经 --console-radius-* 桥接,见上) ── */
+  --radius-xs: var(--console-radius-xs);
+  --radius-sm: var(--console-radius-sm);
+  --radius-md: var(--console-radius-md);
+  --radius-lg: var(--console-radius-lg);
+  --radius-xl: var(--console-radius-xl);
+  --radius-2xl: var(--console-radius-2xl);
+  --radius-3xl: var(--console-radius-3xl);
+  --radius-4xl: var(--console-radius-4xl);
 
   /* ── Font Family ── */
   --font-sans: var(--font-geist);

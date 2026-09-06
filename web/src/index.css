@@ -6,8 +6,18 @@
 @import "@heroui/styles";
 @import "@fontsource/geist-sans/latin.css";
 @import "@fontsource/geist-mono/latin.css";
+/* HopBase 品牌字体(自托管,仅 latin 子集;中文回落系统字体) */
+@import "@fontsource/ibm-plex-sans/latin-400.css";
+@import "@fontsource/ibm-plex-sans/latin-500.css";
+@import "@fontsource/ibm-plex-sans/latin-600.css";
+@import "@fontsource/ibm-plex-sans/latin-700.css";
+@import "@fontsource/ibm-plex-mono/latin-400.css";
+@import "@fontsource/ibm-plex-mono/latin-500.css";
+@import "@fontsource/ibm-plex-mono/latin-600.css";
+@import "@fontsource/ibm-plex-mono/latin-700.css";
 
 @import "./styles/theme.css";
+@import "./styles/brand-hopbase.css";
 @import "./styles/base.css";
 @import "./styles/layout.css";
 @import "./styles/heroui.css";

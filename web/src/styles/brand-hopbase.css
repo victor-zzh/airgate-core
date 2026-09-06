@@ -1,0 +1,253 @@
+/* ==========================================================================
+   02b. HopBase 品牌 token 覆盖层
+   ----------------------------------------------------------------------------
+   设计源头是官网 landing/assets/landing.css:纸面层次 + 发丝线 + 零投影,橙色只做强调。
+   SDK(@doudou-start/airgate-theme)在运行时以 `:root[data-theme="…"]` 注入默认的
+   中性灰 --ag-* token,且不接受自定义主题;本文件用更高特异性的
+   `:root[data-brand="hopbase"][data-theme="…"]` 覆盖,不依赖样式注入顺序。
+   `data-brand` 由 shared/brand.ts 写到 <html>,Essevin / kite 等 ToC 品牌不命中。
+
+   每套主题先按「角色」声明一组 --hb-* 别名(与 landing.css 的变量名一一对应),
+   再把 --ag-* 指向别名:官网调色板变了只改别名一处。
+   浅色 = 官网纸面调色板原值;深色 = 官网终端面板(landing.css .panel--term / .term-*)
+   的暖炭色,面板底与分隔线之间的两级中间色是补的。
+   ========================================================================== */
+
+/* ---------- 与主题无关的静态 token:字体、圆角 ---------- */
+:root[data-brand="hopbase"] {
+  --ag-font-sans: "IBM Plex Sans", "Noto Sans SC", system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --ag-font-mono: "IBM Plex Mono", "SF Mono", Menlo, Consolas, monospace;
+
+  /* 官网控件 4px、面板 6px,不再有 8–24px 的大圆角。
+     --radius 保持 4px 不动(rounded-[var(--radius)] 与 HeroUI ×0.5/×0.75 的小圆角都靠它);
+     Tailwind rounded-* 尺度经 theme.css 的 --console-radius-* 桥接,这里整体压到 6px 以内;
+     HeroUI 按 --radius ×3 取圆角的容器类组件在下方逐个压到 6px。 */
+  --ag-radius-sm: 3px;
+  --ag-radius-md: 4px;
+  --ag-radius-lg: 6px;
+  --ag-radius-xl: 6px;
+  --ag-field-radius: 4px;
+  --field-radius: 4px;
+  --console-radius-xs: 2px;
+  --console-radius-sm: 3px;
+  --console-radius-md: 4px;
+  --console-radius-lg: 6px;
+  --console-radius-xl: 6px;
+  --console-radius-2xl: 6px;
+  --console-radius-3xl: 6px;
+  --console-radius-4xl: 8px;
+}
+
+/* HeroUI 容器类组件的圆角是 calc(var(--radius) * 3) = 12px,与 6px 面板语言不符,逐个压平。
+   按钮组内部按钮保持 0 圆角、只给首尾两端圆角,与 HeroUI 自身规则一致。 */
+:root[data-brand="hopbase"] :is(
+  .button, .card, .modal__dialog, .alert-dialog__dialog, .popover, .alert, .toast, .tabs__tab,
+  .dropdown__popover, .select__popover, .combo-box__popover, .autocomplete__popover,
+  .date-picker__popover, .date-range-picker__popover, .color-picker__popover,
+  .pagination__link, .toggle-button, .toggle-button-group--detached, .accordion--surface,
+  .button-group--horizontal, .button-group--vertical, .toggle-button-group--horizontal, .toggle-button-group--vertical,
+  .table-root--primary
+) {
+  border-radius: var(--console-radius-lg);
+}
+
+:root[data-brand="hopbase"] :is(.badge, .chip, .menu-item, .list-box-item, .table__body) {
+  border-radius: var(--console-radius-md);
+}
+
+:root[data-brand="hopbase"] :is(.button-group--horizontal, .button-group--vertical, .toggle-button-group--horizontal, .toggle-button-group--vertical) :is(.button, .toggle-button) {
+  border-radius: 0;
+}
+
+:root[data-brand="hopbase"] :is(.button-group--horizontal, .toggle-button-group--horizontal) :is(.button, .toggle-button):first-child {
+  border-start-start-radius: var(--console-radius-lg);
+  border-end-start-radius: var(--console-radius-lg);
+}
+
+:root[data-brand="hopbase"] :is(.button-group--horizontal, .toggle-button-group--horizontal) :is(.button, .toggle-button):last-child {
+  border-start-end-radius: var(--console-radius-lg);
+  border-end-end-radius: var(--console-radius-lg);
+}
+
+:root[data-brand="hopbase"] :is(.button-group--vertical, .toggle-button-group--vertical) :is(.button, .toggle-button):first-child {
+  border-start-start-radius: var(--console-radius-lg);
+  border-start-end-radius: var(--console-radius-lg);
+}
+
+:root[data-brand="hopbase"] :is(.button-group--vertical, .toggle-button-group--vertical) :is(.button, .toggle-button):last-child {
+  border-end-start-radius: var(--console-radius-lg);
+  border-end-end-radius: var(--console-radius-lg);
+}
+
+/* ---------- 浅色:纸面(landing.css :root 原值) ---------- */
+:root[data-brand="hopbase"][data-theme="light"],
+:root[data-brand="hopbase"]:not([data-theme="dark"]) {
+  --hb-canvas: #f2f2f0;      /* 页面底 */
+  --hb-paper: #fbfbfa;       /* 面板纸面 */
+  --hb-paper-2: #f4f4f2;     /* 面板内次级底 */
+  --hb-paper-3: #ecece9;     /* 三级底 / 按下态(补) */
+  --hb-fill: #e6e6e2;        /* 幽灵按钮 hover、默认填充:必须比画布深才看得见(补) */
+  --hb-hair: #e0e0dc;        /* 内部分隔线 */
+  --hb-rule: #c8c8c2;        /* 面板外框 */
+  --hb-ink: #0b0d0c;
+  --hb-body: #4a4f49;
+  --hb-muted: #666c60;
+  --hb-faint: #7f847a;
+  --hb-accent: #e2600f;
+  --hb-accent-soft: #fdf0e6;
+  --hb-info: #1769aa;
+  --hb-on-dark: #f6f6f2;     /* 墨色按钮上的文字 */
+
+  --ag-bg: var(--hb-canvas);
+  --ag-bg-deep: var(--hb-canvas);
+  --ag-bg-surface: var(--hb-paper);
+  --ag-bg-elevated: var(--hb-paper);
+  --ag-bg-hover: var(--hb-paper-2);
+  --ag-bg-active: var(--hb-paper-3);
+
+  --ag-surface: var(--hb-paper);
+  --ag-surface-foreground: var(--hb-ink);
+  --ag-surface-secondary: var(--hb-paper-2);
+  --ag-surface-secondary-foreground: var(--hb-ink);
+  --ag-surface-tertiary: var(--hb-paper-3);
+  --ag-surface-tertiary-foreground: var(--hb-ink);
+  --ag-overlay: var(--hb-paper);
+  --ag-overlay-foreground: var(--hb-ink);
+  --ag-default-bg: var(--hb-fill);
+  --ag-default-foreground: var(--hb-ink);
+  --ag-segment: var(--hb-paper);
+  --ag-segment-foreground: var(--hb-ink);
+
+  --ag-field-background: var(--hb-paper);
+  --ag-field-foreground: var(--hb-ink);
+  --ag-field-placeholder: var(--hb-muted);   /* #666c60 on #fbfbfa ≈ 4.9:1 */
+
+  --ag-border: var(--hb-rule);
+  --ag-border-subtle: var(--hb-hair);
+  --ag-border-focus: var(--hb-accent);
+  --ag-glass: rgba(251, 251, 250, 0.92);
+  --ag-glass-border: var(--hb-hair);
+  --ag-scrollbar: var(--hb-rule);
+
+  --ag-text: var(--hb-ink);
+  --ag-text-secondary: var(--hb-body);
+  --ag-text-tertiary: var(--hb-muted);
+  --ag-text-inverse: var(--hb-on-dark);
+  --ag-muted: var(--hb-muted);
+
+  /* 主按钮 = 墨色实心;橙色只在 subtle / glow(选中、焦点)出现 */
+  --ag-primary: var(--hb-ink);
+  --ag-primary-foreground: var(--hb-on-dark);
+  --ag-primary-hover: #2a2d28;
+  --ag-primary-subtle: var(--hb-accent-soft);
+  --ag-primary-glow: rgba(226, 96, 15, 0.22);
+  --ag-info: var(--hb-info);
+  --ag-info-subtle: rgba(23, 105, 170, 0.12);
+
+  --ag-success: #2f7d4f;
+  --ag-success-foreground: #ffffff;
+  --ag-success-subtle: #e8f3ec;
+  --ag-warning: #b7791f;
+  --ag-warning-foreground: #ffffff;
+  --ag-warning-subtle: #fbf1dc;
+  --ag-danger: #b3261e;
+  --ag-danger-foreground: #ffffff;
+  --ag-danger-subtle: #fbe9e7;
+
+  /* 零投影:面板靠发丝线分层;弹层保留一层极淡投影。
+     "无投影"必须写成透明阴影而不是 none:这些变量会被拼进逗号分隔的 box-shadow 列表
+     (焦点环、ring 工具类),列表里出现 none 整条声明作废,焦点环就没了。 */
+  --ag-shadow-sm: 0 0 0 0 transparent inset;
+  --ag-shadow-md: 0 0 0 0 transparent inset;
+  --ag-shadow-lg: 0 12px 28px rgba(11, 13, 12, 0.10);
+  --ag-shadow-glow: 0 0 0 1px rgba(226, 96, 15, 0.25);
+  --surface-shadow: 0 0 0 0 transparent inset;
+  --field-shadow: 0 0 0 0 transparent inset;
+  --overlay-shadow: 0 12px 28px rgba(11, 13, 12, 0.10);
+  --backdrop: rgba(11, 13, 12, 0.42);
+  --focus: var(--hb-accent);
+}
+
+/* ---------- 深色:官网终端面板的暖炭 ---------- */
+:root[data-brand="hopbase"][data-theme="dark"] {
+  --hb-canvas: #14150f;      /* landing --dark */
+  --hb-paper: #1a1b15;       /* 面板底(补) */
+  --hb-paper-2: #21231c;     /* 次级底(补) */
+  --hb-paper-3: #2a2c26;     /* 三级底 = .panel--term 边框 */
+  --hb-fill: #2a2c26;
+  --hb-hair: #262922;        /* .term-hd 分隔线 */
+  --hb-rule: #363930;        /* 面板外框(补) */
+  --hb-ink: #f2f3ec;         /* .term-tabs 选中文字 */
+  --hb-body: #c9cec1;        /* .term-body 正文 */
+  --hb-muted: #8b9184;       /* .term-title */
+  --hb-faint: #5f6659;       /* 提示符 / 注释 */
+  --hb-accent: #ff9b4f;      /* .term-body .st */
+  --hb-accent-soft: rgba(255, 155, 79, 0.13);
+  --hb-info: #7fb4e6;
+  --hb-on-dark: #14150f;     /* 浅色按钮上的文字 */
+
+  --ag-bg: var(--hb-canvas);
+  --ag-bg-deep: #0f100b;
+  --ag-bg-surface: var(--hb-paper);
+  --ag-bg-elevated: var(--hb-paper);
+  --ag-bg-hover: var(--hb-paper-2);
+  --ag-bg-active: var(--hb-paper-3);
+
+  --ag-surface: var(--hb-paper);
+  --ag-surface-foreground: var(--hb-ink);
+  --ag-surface-secondary: var(--hb-paper-2);
+  --ag-surface-secondary-foreground: var(--hb-ink);
+  --ag-surface-tertiary: var(--hb-paper-3);
+  --ag-surface-tertiary-foreground: var(--hb-ink);
+  --ag-overlay: var(--hb-paper);
+  --ag-overlay-foreground: var(--hb-ink);
+  --ag-default-bg: var(--hb-fill);
+  --ag-default-foreground: var(--hb-ink);
+  --ag-segment: var(--hb-paper-3);
+  --ag-segment-foreground: var(--hb-ink);
+
+  --ag-field-background: var(--hb-paper);
+  --ag-field-foreground: var(--hb-ink);
+  --ag-field-placeholder: var(--hb-muted);   /* #8b9184 on #1a1b15 ≈ 5.3:1 */
+
+  --ag-border: var(--hb-rule);
+  --ag-border-subtle: var(--hb-hair);
+  --ag-border-focus: var(--hb-accent);
+  --ag-glass: rgba(26, 27, 21, 0.92);
+  --ag-glass-border: var(--hb-hair);
+  --ag-scrollbar: #3a3d36;
+
+  --ag-text: var(--hb-ink);
+  --ag-text-secondary: var(--hb-body);
+  --ag-text-tertiary: var(--hb-muted);
+  --ag-text-inverse: var(--hb-on-dark);
+  --ag-muted: var(--hb-muted);
+
+  --ag-primary: var(--hb-ink);
+  --ag-primary-foreground: var(--hb-on-dark);
+  --ag-primary-hover: #d9ddd2;
+  --ag-primary-subtle: var(--hb-accent-soft);
+  --ag-primary-glow: rgba(255, 155, 79, 0.25);
+  --ag-info: var(--hb-info);
+  --ag-info-subtle: rgba(127, 180, 230, 0.14);
+
+  --ag-success: #9fc7a6;                     /* .term-body .fn */
+  --ag-success-foreground: var(--hb-on-dark);
+  --ag-success-subtle: rgba(159, 199, 166, 0.14);
+  --ag-warning: #e0b25a;
+  --ag-warning-foreground: var(--hb-on-dark);
+  --ag-warning-subtle: rgba(224, 178, 90, 0.14);
+  --ag-danger: #e57368;
+  --ag-danger-foreground: var(--hb-on-dark);
+  --ag-danger-subtle: rgba(229, 115, 104, 0.14);
+
+  --ag-shadow-sm: 0 0 0 0 transparent inset;
+  --ag-shadow-md: 0 0 0 0 transparent inset;
+  --ag-shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.35);
+  --ag-shadow-glow: 0 0 0 1px rgba(255, 155, 79, 0.3);
+  --surface-shadow: 0 0 0 0 transparent inset;
+  --field-shadow: 0 0 0 0 transparent inset;
+  --overlay-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  --backdrop: rgba(0, 0, 0, 0.62);
+  --focus: var(--hb-accent);
+}
