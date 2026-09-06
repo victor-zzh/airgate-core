@@ -177,16 +177,18 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
 
   // 站点设置返回后按来源站 / 站名复算品牌,写到 <html data-brand>:
   // 品牌皮肤(styles/brand-hopbase.css)只对 hopbase 生效,ToC 品牌不受影响。
-  // 未返回前沿用启动时的临时品牌,避免默认值把 ToC 实例误判成 HopBase。
+  // 未返回或请求失败时沿用启动时的临时品牌——settings_loaded 在请求失败时也为 true,
+  // 但此时 data 为空、站名回落默认 HopBase,会把 ToC 实例误判成 HopBase,故以 data 为准。
+  const settingsResolved = data !== undefined;
   useEffect(() => {
-    if (!value.settings_loaded) return;
+    if (!settingsResolved) return;
     applyBrand(resolveBrand({
       siteId: value.site_id,
       siteName: value.site_name,
       brandLabel: value.site_brand_label,
       logo: value.site_logo,
     }));
-  }, [value.settings_loaded, value.site_id, value.site_name, value.site_brand_label, value.site_logo]);
+  }, [settingsResolved, value.site_id, value.site_name, value.site_brand_label, value.site_logo]);
 
   return (
     <SiteSettingsContext.Provider value={value}>
