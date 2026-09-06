@@ -21,6 +21,7 @@
 @import "./styles/base.css";
 @import "./styles/layout.css";
 @import "./styles/heroui.css";
+@import "./styles/brand-hopbase-shell.css";
 @import "./styles/pages.css";
 @import "./styles/onboarding.css";
 @import "./styles/tables.css";

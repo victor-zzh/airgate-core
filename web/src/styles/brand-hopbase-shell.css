@@ -1,0 +1,342 @@
+/* ==========================================================================
+   02c. HopBase 品牌 · 壳层与通用组件皮肤(P2)
+   ----------------------------------------------------------------------------
+   brand-hopbase.css 只放 token;这里放"按 token 画出来的组件":顶栏、侧栏、账户区、
+   tab、分段器、按钮规格、指标发丝线网格、HopBase 的跳动 loading。
+   全部限定在 [data-brand="hopbase"] 下,其它品牌不受影响;不改任何功能与结构语义。
+   设计标准见 docs/console-design-standard.md。
+   ========================================================================== */
+
+:root[data-brand="hopbase"] {
+  --ag-sidebar-width: 236px;
+  --ag-sidebar-collapsed: 56px;
+}
+
+/* ---------- 顶栏:纸面底 + 发丝线,不做毛玻璃与投影 ---------- */
+[data-brand="hopbase"] .ag-topbar {
+  height: 52px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--separator);
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* 顶栏 52px:主内容区与侧栏品牌行同步对齐 */
+[data-brand="hopbase"] .ag-main {
+  padding-top: 52px;
+}
+
+/* ---------- 侧栏:品牌行等高于顶栏,分组标题 mono 小标签,活动项橙色竖线 ---------- */
+[data-brand="hopbase"] .ag-sidebar-brand {
+  height: 52px;
+  border-bottom: 1px solid var(--separator);
+}
+
+[data-brand="hopbase"] .ag-sidebar-nav {
+  padding-top: 10px;
+}
+
+[data-brand="hopbase"] .ag-sidebar-section-label {
+  font-family: var(--ag-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+
+[data-brand="hopbase"] .ag-sidebar-nav-item {
+  border-radius: 0;
+  font-size: 0.84375rem;
+}
+
+[data-brand="hopbase"] .ag-sidebar-nav-item:hover {
+  background: var(--surface-secondary);
+}
+
+[data-brand="hopbase"] .ag-sidebar-nav-item[data-active="true"] {
+  background: var(--surface);
+  box-shadow: inset 2px 0 0 var(--hb-accent);
+  font-weight: 500;
+}
+
+[data-brand="hopbase"] .ag-sidebar-nav-item svg {
+  stroke-width: 1.8;
+}
+
+/* 折叠成图标栏时活动项也保留橙线 */
+[data-brand="hopbase"] .ag-sidebar-nav-item.mx-auto[data-active="true"] {
+  border-radius: var(--radius);
+  box-shadow: inset 2px 0 0 var(--hb-accent);
+}
+
+/* ---------- 侧栏底部账户区(替代原来的两个功能按钮) ---------- */
+.ag-account-row,
+[data-brand="hopbase"] .ag-account-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  height: 46px;
+  min-height: 46px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--foreground);
+  font-weight: 400;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ag-account-row:hover {
+  background: var(--surface-secondary);
+}
+
+.ag-account-row--mini,
+[data-brand="hopbase"] .ag-account-row--mini {
+  justify-content: center;
+  gap: 0;
+  padding: 0;
+}
+
+.ag-account-avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-secondary);
+  color: var(--foreground);
+  font: 600 11px var(--ag-font-mono);
+  letter-spacing: 0.02em;
+}
+
+.ag-account-copy {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.ag-account-name {
+  display: block;
+  overflow: hidden;
+  font-size: 0.78125rem;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ag-account-sub {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--muted);
+  font: 500 10px/1.3 var(--ag-font-mono);
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ag-account-caret {
+  flex: none;
+  color: var(--muted);
+}
+
+/* ---------- 页面 tab:下划线 + 橙色指示条,不再是胶囊 ---------- */
+[data-brand="hopbase"] .ag-page-tabs .tabs__list {
+  gap: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--separator);
+  border-radius: 0;
+  background: transparent;
+}
+
+[data-brand="hopbase"] .ag-page-tabs .tabs__tab {
+  height: 2.5rem;
+  padding-inline: 0.875rem;
+  border-radius: 0;
+  color: var(--ag-text-secondary);
+}
+
+[data-brand="hopbase"] .ag-page-tabs .tabs__tab[data-selected="true"] {
+  color: var(--foreground);
+}
+
+[data-brand="hopbase"] .ag-page-tabs .tabs__indicator {
+  top: auto;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 0;
+  background: var(--hb-accent);
+  box-shadow: none;
+}
+
+[data-brand="hopbase"] .ag-page-tabs .tabs__separator {
+  display: none;
+}
+
+/* ---------- 分段器:发丝边框组,选中 = 浅底 + 橙色下划线,黑色只留给主按钮 ---------- */
+[data-brand="hopbase"] .ag-segmented-tabs .tabs__list {
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+}
+
+[data-brand="hopbase"] .ag-segmented-tabs .tabs__tab {
+  border-radius: 0;
+  color: var(--ag-text-secondary);
+  font-family: var(--ag-font-mono);
+  font-size: 0.75rem;
+}
+
+[data-brand="hopbase"] .ag-segmented-tabs .tabs__tab + .tabs__tab {
+  border-left: 1px solid var(--border);
+}
+
+[data-brand="hopbase"] .ag-segmented-tabs .tabs__tab[data-selected="true"] {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+[data-brand="hopbase"] .ag-segmented-tabs .tabs__indicator {
+  border-radius: 0;
+  background: var(--surface-secondary);
+  box-shadow: inset 0 -2px 0 var(--hb-accent);
+}
+
+[data-brand="hopbase"] .ag-segmented-tabs .tabs__separator {
+  display: none;
+}
+
+/* ---------- 按钮:官网控件规格(36 / 30 / 44),次级按钮改发丝线描边 ---------- */
+[data-brand="hopbase"] .button {
+  font-weight: 500;
+}
+
+[data-brand="hopbase"] .button--md {
+  height: 2.25rem;
+  padding-inline: 0.875rem;
+  font-size: 0.8125rem;
+}
+
+[data-brand="hopbase"] .button--sm {
+  height: 1.875rem;
+  padding-inline: 0.75rem;
+  font-size: 0.75rem;
+}
+
+[data-brand="hopbase"] .button--lg {
+  height: 2.75rem;
+  padding-inline: 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+[data-brand="hopbase"] .button--secondary {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--foreground);
+}
+
+[data-brand="hopbase"] .button--secondary:hover {
+  border-color: var(--foreground);
+  background: transparent;
+}
+
+/* ---------- 指标:一张发丝线网格,不做浮起的卡片 ---------- */
+[data-brand="hopbase"] .ag-stats-grid {
+  gap: 1px !important;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--console-radius-lg);
+  background: var(--separator);
+}
+
+[data-brand="hopbase"] .ag-stats-grid .ag-dashboard-metric {
+  border: 0;
+  border-radius: 0;
+  background: var(--surface);
+  box-shadow: none;
+}
+
+[data-brand="hopbase"] .ag-dashboard-panel,
+[data-brand="hopbase"] .ag-dashboard-toolbar {
+  border-color: var(--border);
+}
+
+/* ---------- HopBase loading:三枚方块在发丝线上依次跳起;光标只留给流式文字 ---------- */
+.ag-hop-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.ag-hop {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 12px;
+  padding-bottom: 1px;
+  border-bottom: 1px solid var(--separator);
+  vertical-align: middle;
+}
+
+.ag-hop i {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
+  background: var(--hb-accent, var(--accent));
+  animation: ag-hop 1s cubic-bezier(0.3, 0, 0.2, 1) infinite;
+}
+
+.ag-hop i:nth-child(2) {
+  animation-delay: 0.14s;
+}
+
+.ag-hop i:nth-child(3) {
+  animation-delay: 0.28s;
+  background: var(--foreground);
+}
+
+.ag-hop--lg {
+  gap: 4px;
+  height: 18px;
+}
+
+.ag-hop--lg i {
+  width: 7px;
+  height: 7px;
+}
+
+@keyframes ag-hop {
+  0%, 55%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ag-hop i {
+    animation: none;
+  }
+}
+
+.ag-hop-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: inherit;
+}
+
+/* 页面切换的顶部扫线沿用,只把颜色换成官网橙 */
+[data-brand="hopbase"] .ag-global-loading-line span,
+[data-brand="hopbase"] .ag-global-loading-line::after {
+  background: var(--hb-accent);
+}

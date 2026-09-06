@@ -1,3 +1,5 @@
+import { HopLoader } from '../ui/HopLoader';
+
 export function TableLoadingRow({
   colSpan,
   minHeight = 220,
@@ -8,8 +10,8 @@ export function TableLoadingRow({
   return (
     <tr data-key="loading" data-slot="tr">
       <td colSpan={colSpan} data-slot="td">
-        <div aria-busy="true" aria-live="polite" className="w-full" style={{ minHeight }}>
-          <span className="sr-only">Loading</span>
+        <div aria-busy="true" className="ag-hop-block w-full" style={{ minHeight }}>
+          <HopLoader size="lg" />
         </div>
       </td>
     </tr>
