@@ -47,12 +47,12 @@
 }
 
 /* ---------- 筛选工具条:两条发丝线夹一行,不做带边框的盒子 ---------- */
+/* 筛选条:不做带边框的盒子,也不再上下夹发丝线——标题行下方与表格卡片上沿本就是两条边界,
+   再加两条就成了 20px 内三条横线;分区交给间距 */
 [data-brand="hopbase"] .ag-dashboard-toolbar,
 [data-brand="hopbase"] .ag-filter-bar {
-  padding: 0.625rem 0;
-  border-width: 1px 0;
-  border-style: solid;
-  border-color: var(--separator);
+  padding: 0 0 0.25rem;
+  border: 0;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
@@ -60,7 +60,7 @@
 }
 
 [data-brand="hopbase"] .ag-filter-bar {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
 }
 
 /* 工具条里的控件统一 30px 高、4px 角(日期区间触发器是 HeroUI DateRangePicker,按 slot 压高度) */
