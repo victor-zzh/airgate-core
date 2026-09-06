@@ -289,6 +289,26 @@ func TestHostForwardUpstreamTimeoutFailsOverToNextAccount(t *testing.T) {
 	}
 }
 
+func TestHostForwardExhaustsAllCandidatesBeyondLegacyLimit(t *testing.T) {
+	fixture := newHostStabilityFixture(t, 4, func(call int32, _ *sdk.ForwardRequest) (sdk.ForwardOutcome, error) {
+		if call <= 3 {
+			return sdk.ForwardOutcome{}, context.DeadlineExceeded
+		}
+		return hostQuotaSuccessOutcome(), nil
+	})
+
+	payload, err := fixture.host.forward(fixture.ctx, fixture.request(0))
+	if err != nil {
+		t.Fatalf("forward after exhausting candidates: %v", err)
+	}
+	if got := payload["status_code"]; got != http.StatusOK {
+		t.Fatalf("status_code = %v, want %d", got, http.StatusOK)
+	}
+	if calls := fixture.gateway.calls.Load(); calls != 4 {
+		t.Fatalf("gateway calls = %d, want 4", calls)
+	}
+}
+
 func TestHostForwardStreamUpstreamTimeoutFailsOverBeforeCommit(t *testing.T) {
 	fixture := newHostStabilityFixture(t, 2, func(call int32, _ *sdk.ForwardRequest) (sdk.ForwardOutcome, error) {
 		if call == 1 {

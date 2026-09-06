@@ -70,9 +70,6 @@ func (f *Forwarder) resolveModelFamily(platform, model string) string {
 	return scheduler.ModelFamily(platform, model)
 }
 
-// maxFailoverAttempts 最大 failover 次数（账号级失败后切换新账号上游调用的上限）。
-const maxFailoverAttempts = 3
-
 // 同账号重试：分组里已没有其它候选（单供给，或备用也都被排除）时，若上一次失败是
 // 网络抖动类瞬时故障（连接被重置 / EOF / 秒回 5xx），原地在同一账号再试一次，
 // 而不是把错误吐给客户端。延迟给上游一个极短的恢复窗口；上游给了 Retry-After 则照用但封顶。
@@ -97,7 +94,9 @@ const statusClientClosedRequest = 499
 // 与 scheduler 首次无提示限流的默认冷却保持一致，避免客户端在账号仍冷却时过早重试。
 const allRoutesFailedDefaultRetryAfter = 60 * time.Second
 
-// Forward 入口。失败时自动 failover 到其它账号，最多 maxFailoverAttempts 次。
+// Forward 入口。失败时自动 failover 到其它账号，直到当前路由的候选账号耗尽。
+// 调度器通过 exclude IDs 保证每次 failover 选择新的账号；不能用固定次数
+// 截断，否则分组中的第 4 个及之后的健康账号永远无法参与兜底。
 //
 // Middleware：OnForwardBegin 只在首次 attempt 调用（避免 failover 污染审计计数），
 // OnForwardEnd 在最终一次 attempt（成功或放弃）触发，LIFO 降序。Begin DENY 会拒绝请求。
@@ -189,7 +188,7 @@ func (f *Forwarder) Forward(c *gin.Context) {
 		return
 	}
 
-	hardExclude := make([]int, 0, maxFailoverAttempts*len(routes))
+	hardExclude := make([]int, 0, len(routes))
 	var mwBag map[string]string
 	beginCalled := false
 	ctx := c.Request.Context()
@@ -206,7 +205,7 @@ func (f *Forwarder) Forward(c *gin.Context) {
 		state.selectedRoute = route
 		state.keyInfo = keyInfoForRoute(state.keyInfo, route)
 
-		softExclude := make([]int, 0, maxFailoverAttempts)
+		softExclude := make([]int, 0, 8)
 		attempt := 0
 		queueDeadline := time.Now().Add(queueWaitTimeout)
 		queuePollDelay := queuePollInterval
@@ -217,7 +216,7 @@ func (f *Forwarder) Forward(c *gin.Context) {
 		var lastSoftFailure *forwardExecution
 		lastSoftFailureAccount := 0
 
-		for attempt < maxFailoverAttempts {
+		for {
 			if status := canceledRequestStatus(ctx.Err()); status != 0 {
 				f.recordCanceledRequest(c, state, status, false)
 				logger.Debug("forward_request_canceled",
@@ -1025,7 +1024,7 @@ func streamAbortRetryable(c *gin.Context) bool {
 // 用 400 + "Upstream request failed" 表达其上游转发失败），且组内各账号支持的
 // 模型/参数集合不同，换号确有救活的机会。真正的客户端错误在所有账号上都会 4xx，
 // 穷尽后 Forward 回放最后一次原始响应，客户端看到的结果与不重试时一致，
-// 代价只是 maxFailoverAttempts 上限内的额外上游调用。
+// 代价是当前路由候选耗尽前的额外上游调用。
 // 唯独 504 网关超时执行结果未知，禁止在其它账号上重放。
 func replayableClientError(outcome sdk.ForwardOutcome) bool {
 	return outcome.Upstream.StatusCode != http.StatusGatewayTimeout
