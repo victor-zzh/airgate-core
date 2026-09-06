@@ -15,9 +15,9 @@ export function SiteBrand({ className = '', iconOnly = false, iconSize = 30 }: S
   const site = useSiteSettings();
   const { i18n } = useTranslation();
   const siteName = site.site_name.trim();
-  const isEssevin = site.site_id === 'ink' || siteName.toLowerCase() === 'essevin';
-  const isKite = site.site_id === 'kite'
-    || /kite/i.test(`${site.site_name} ${site.site_brand_label} ${site.site_logo}`);
+  // 品牌判定集中在 SiteSettingsProvider(shared/brand.ts),这里只消费结果
+  const isEssevin = site.brand === 'essevin';
+  const isKite = site.brand === 'kite';
   const language = i18n.resolvedLanguage || i18n.language || '';
   const isChinese = language.startsWith('zh');
   const localName = language === 'zh-CN' || language === 'zh' ? '萃灵' : '萃靈';

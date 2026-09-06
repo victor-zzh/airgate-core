@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { settingsApi } from '../../shared/api/settings';
 import { queryKeys } from '../../shared/queryKeys';
 import { getOriginSite, subscribeOriginSite } from '../../shared/originSite';
-import { applyBrand, resolveBrand } from '../../shared/brand';
+import { applyBrand, resolveBrand, type BrandId } from '../../shared/brand';
 import { mergeLegacyNotification, parseNotificationHistory, type SiteNotification } from '../../shared/notifications';
 import defaultLogoUrl from '../../assets/logo.svg';
 
@@ -63,6 +63,8 @@ interface SiteSettings {
   site_id: string;
   site_name: string;
   site_brand_label: string;
+  /** 解析出的品牌;站点设置未返回或站名认不出时为 null(此时沿用首屏判定) */
+  brand: BrandId | null;
   site_subtitle: string;
   site_logo: string;
   api_base_url: string;
@@ -92,6 +94,7 @@ const defaults: SiteSettings = {
   site_id: '',
   site_name: 'HopBase',
   site_brand_label: 'HopBase',
+  brand: null,
   site_subtitle: 'Control Panel',
   site_logo: '',
   api_base_url: '',
@@ -134,6 +137,8 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     ...data,
     // 来源站品牌覆盖：来源站在 sites_branding 有配置时优先生效
     site_id: originSite,
+    // 品牌只按「站点设置 + 是否配置了该来源站」判定,?ref= 之类未配置的来源站不算品牌
+    brand: data === undefined ? null : resolveBrand({ siteId: originSite, siteName: data.site_name, hasSiteBranding: !!branding }),
     site_name: branding?.name || data?.site_name || defaults.site_name,
     site_brand_label: branding?.brand_label || branding?.blog_chrome?.brand_label || branding?.name || data?.site_name || defaults.site_brand_label,
     site_logo: branding?.logo || data?.site_logo || defaults.site_logo,
@@ -175,20 +180,12 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     document.title = value.site_name || defaults.site_name;
   }, [value.site_logo, value.site_name]);
 
-  // 站点设置返回后按来源站 / 站名复算品牌,写到 <html data-brand>:
-  // 品牌皮肤(styles/brand-hopbase.css)只对 hopbase 生效,ToC 品牌不受影响。
-  // 未返回或请求失败时沿用启动时的临时品牌——settings_loaded 在请求失败时也为 true,
-  // 但此时 data 为空、站名回落默认 HopBase,会把 ToC 实例误判成 HopBase,故以 data 为准。
-  const settingsResolved = data !== undefined;
+  // 站点设置返回后把解析出的品牌写到 <html data-brand>:皮肤(styles/brand-hopbase.css)
+  // 只对 hopbase 生效,ToC 品牌不受影响。请求失败或站名认不出时 brand 为 null,
+  // 保持首屏的域名判定不动,绝不回落成 HopBase。
   useEffect(() => {
-    if (!settingsResolved) return;
-    applyBrand(resolveBrand({
-      siteId: value.site_id,
-      siteName: value.site_name,
-      brandLabel: value.site_brand_label,
-      logo: value.site_logo,
-    }));
-  }, [settingsResolved, value.site_id, value.site_name, value.site_brand_label, value.site_logo]);
+    if (value.brand) applyBrand(value.brand);
+  }, [value.brand]);
 
   return (
     <SiteSettingsContext.Provider value={value}>

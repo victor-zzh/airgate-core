@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { injectThemeStyle, setTheme, type ThemeName } from '@doudou-start/airgate-theme';
-import { defaultThemeForBrand, getCurrentBrand } from '../../shared/brand';
+import { defaultThemeForBrand, getCurrentBrand, subscribeBrand } from '../../shared/brand';
 
 interface ThemeContextValue {
   theme: ThemeName;
@@ -9,8 +9,12 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-// SDK 自带的读取函数把「没存过」也当成 dark;这里区分开:用户存过就尊重,
-// 没存过按品牌给默认(HopBase 与官网衔接用浅色,其余品牌沿用深色)。
+// SDK 的 setTheme 每次都把当前主题写进 'ag-theme',分不清「用户选的」和「系统给的默认」;
+// 历史上所有打开过控制台的浏览器都因此被写成 dark。这里另记一个"用户点过切换"的标记,
+// 只有点过的才算偏好;没点过的按品牌给默认(HopBase 与官网衔接用浅色,其余品牌沿用深色),
+// 并在站点设置解析出品牌后重算一次。
+const THEME_CHOICE_KEY = 'ag-theme-choice';
+
 function readStoredTheme(): ThemeName | null {
   try {
     const stored = localStorage.getItem('ag-theme');
@@ -20,8 +24,25 @@ function readStoredTheme(): ThemeName | null {
   }
 }
 
+function userChoseTheme(): boolean {
+  try {
+    return localStorage.getItem(THEME_CHOICE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function rememberThemeChoice(): void {
+  try {
+    localStorage.setItem(THEME_CHOICE_KEY, '1');
+  } catch {
+    // localStorage 不可用时,切换仍在本次会话内生效
+  }
+}
+
 export function initialTheme(): ThemeName {
-  return readStoredTheme() ?? defaultThemeForBrand(getCurrentBrand());
+  if (userChoseTheme()) return readStoredTheme() ?? defaultThemeForBrand(getCurrentBrand());
+  return defaultThemeForBrand(getCurrentBrand());
 }
 
 function syncHeroUIThemeClass(theme: ThemeName) {
@@ -43,7 +64,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     syncHeroUIThemeClass(theme);
   }, [theme]);
 
+  // 品牌在站点设置返回后可能变化;没有用户偏好时跟着品牌重算默认主题。
+  useEffect(() => subscribeBrand((brand) => {
+    if (userChoseTheme()) return;
+    setThemeState(defaultThemeForBrand(brand));
+  }), []);
+
   const toggleTheme = useCallback(() => {
+    rememberThemeChoice();
     setThemeState((t) => (t === 'dark' ? 'light' : 'dark'));
   }, []);
   const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme]);
