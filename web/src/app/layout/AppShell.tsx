@@ -189,6 +189,9 @@ export function AppShell({ children }: AppShellProps) {
   const { theme, toggleTheme } = useTheme();
   const site = useSiteSettings();
   const [collapsed, setCollapsed] = usePersistentBoolean(SIDEBAR_COLLAPSED_STORAGE_KEY, false);
+  // 全出血插件页(AI Chat / 创作工作坊)进入时侧栏自动收成图标栏,让插件自己的会话 / 项目栏成为
+  // 唯一展开的左栏;图标栏顶部按钮可临时展开,换路由即恢复;不改用户的持久折叠偏好。
+  const [railExpanded, setRailExpanded] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const isMobile = useIsMobile();
   const matchRoute = useMatchRoute();
@@ -293,7 +296,13 @@ export function AppShell({ children }: AppShellProps) {
   }, [site.site_name]);
 
   // On mobile, sidebar is always expanded inside the drawer
-  const sidebarCollapsed = isMobile ? false : collapsed;
+  const railRoute = /^\/(chat|studio)(\/|$)/.test(routerPath);
+  useEffect(() => {
+    setRailExpanded(false);
+  }, [routerPath]);
+  const sidebarCollapsed = isMobile ? false : (railRoute ? !railExpanded : collapsed);
+  const expandSidebar = () => (railRoute ? setRailExpanded(true) : setCollapsed(false));
+  const collapseSidebar = () => (railRoute ? setRailExpanded(false) : setCollapsed(true));
 
   const sidebarContent = (
     <>
@@ -311,7 +320,7 @@ export function AppShell({ children }: AppShellProps) {
               isIconOnly
               size="sm"
               variant="ghost"
-              onPress={() => setCollapsed(true)}
+              onPress={collapseSidebar}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -327,7 +336,7 @@ export function AppShell({ children }: AppShellProps) {
             isIconOnly
             size="sm"
             variant="ghost"
-            onPress={() => setCollapsed(false)}
+            onPress={expandSidebar}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -452,7 +461,7 @@ export function AppShell({ children }: AppShellProps) {
       ) : (
         <aside
           className="relative flex flex-col border-r border-border bg-surface transition-[width] duration-150 ease-out"
-          style={{ width: collapsed ? 'var(--ag-sidebar-collapsed)' : 'var(--ag-sidebar-width)' }}
+          style={{ width: sidebarCollapsed ? 'var(--ag-sidebar-collapsed)' : 'var(--ag-sidebar-width)' }}
         >
           {sidebarContent}
         </aside>
