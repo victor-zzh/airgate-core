@@ -151,3 +151,11 @@
   overflow-wrap: anywhere;
   word-break: break-all;
 }
+
+/* 空态 / 加载态时表格不再撑到列宽之和的最小宽度:否则空态内容按 1370px 的表宽居中,
+   在 1156px 的可视区里明显偏右;这时没有数据行,表头压缩到容器宽度即可 */
+.ag-usage-records-table:has(.empty-state) .ag-usage-table,
+.ag-usage-records-table:has([aria-busy="true"]) .ag-usage-table {
+  min-width: 0 !important;
+  width: 100%;
+}

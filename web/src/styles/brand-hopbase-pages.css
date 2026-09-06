@@ -787,3 +787,27 @@
 [data-brand="hopbase"] :is(.ag-api-keys-table, .ag-groups-table) .ag-metric-chip-value {
   overflow: visible;
 }
+
+/* ---------- 分布列表(模型 / 分组 / 用户榜):名称允许折两行,不再截成「官号满…」 ---------- */
+[data-brand="hopbase"] .ag-distribution-table-scroll td:first-child .font-medium,
+[data-brand="hopbase"] .ag-distribution-table-scroll td:first-child .truncate {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
+}
+
+/* ---------- 下拉触发器:图标 / 文字 / 指示箭头一律垂直居中(HeroUI 默认 align-items: normal) ---------- */
+[data-brand="hopbase"] .select__trigger,
+[data-brand="hopbase"] .combo-box__trigger,
+[data-brand="hopbase"] .dropdown__trigger {
+  display: inline-flex;
+  align-items: center;
+}
+
+[data-brand="hopbase"] .select__trigger > svg {
+  flex-shrink: 0;
+}

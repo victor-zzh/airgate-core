@@ -125,7 +125,7 @@ function DistributionCard({
   title,
   data,
   firstColumnTitle,
-  firstColumnWidth = '30%',
+  firstColumnWidth = '36%',
 }: {
   title: string;
   data: DistributionItem[];
@@ -192,28 +192,28 @@ function DistributionCard({
                 align: 'end',
                 key: 'requests',
                 title: t('usage.requests'),
-                width: '16%',
+                width: '15%',
                 render: (item) => <span className="truncate font-mono text-text-secondary">{item.requests.toLocaleString()}</span>,
               },
               {
                 align: 'end',
                 key: 'tokens',
                 title: t('usage.tokens'),
-                width: '18%',
+                width: '16%',
                 render: (item) => <span className="truncate font-mono text-text-secondary">{fmtNum(item.tokens)}</span>,
               },
               {
                 align: 'end',
                 key: 'actualCost',
                 title: t('usage.actual_cost'),
-                width: '18%',
+                width: '16%',
                 render: (item) => <CostValue className="truncate font-mono" value={item.actualCost} tone="actual" />,
               },
               {
                 align: 'end',
                 key: 'totalCost',
                 title: t('usage.standard_cost'),
-                width: '18%',
+                width: '16%',
                 render: (item) => <CostValue className="truncate font-mono" value={item.totalCost} tone="standard" />,
               },
             ]}
@@ -770,13 +770,13 @@ export default function UsagePage() {
             <DistributionCard
               title={t('usage.model_distribution')}
               firstColumnTitle={t('usage.model')}
-              firstColumnWidth="30%"
+              firstColumnWidth="36%"
               data={modelDistribution}
             />
             <DistributionCard
               title={t('usage.group_distribution')}
               firstColumnTitle={t('groups.group')}
-              firstColumnWidth="26%"
+              firstColumnWidth="32%"
               data={groupDistribution}
             />
           </div>

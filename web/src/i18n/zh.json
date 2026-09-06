@@ -1721,6 +1721,9 @@
     "groups_all": "全部分组",
     "groups_count": "{{count}} 个分组",
     "no_account": "未开通登录账号",
+    "account_col": "登录账号",
+    "account_opened": "已开通",
+    "period_col": "周期",
     "no_account_hint": "旧版成员没有登录账号，只能用您代建的密钥；如需登录请删除后重新添加"
   },
   "setup": {

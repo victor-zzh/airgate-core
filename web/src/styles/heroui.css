@@ -282,11 +282,19 @@
 }
 
 .ag-elevation-modal .modal__body {
+  /* 内容短时弹窗随内容收高,不把 body 撑到最大高度留一片空白;内容长时仍在 body 内滚动 */
+  flex: 0 1 auto;
   min-height: 0;
   overflow: auto;
   overflow-x: hidden;
   padding-inline: 0.25rem;
   scroll-padding: 0.25rem;
+}
+
+.ag-elevation-modal.modal__dialog--scroll-inside,
+.ag-elevation-modal.modal__dialog--cover {
+  height: auto !important;
+  min-height: 0 !important;
 }
 
 .ag-form-scroll-safe {

@@ -1721,6 +1721,9 @@
     "groups_all": "All groups",
     "groups_count": "{{count}} groups",
     "no_account": "No login account",
+    "account_col": "Login account",
+    "account_opened": "Enabled",
+    "period_col": "Period",
     "no_account_hint": "Legacy member without a login account; only keys you created for them work. Delete and re-add to enable login."
   },
   "setup": {

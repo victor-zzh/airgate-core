@@ -1721,6 +1721,9 @@
     "groups_all": "Todos los grupos",
     "groups_count": "{{count}} grupos",
     "no_account": "Sin cuenta de acceso",
+    "account_col": "Cuenta",
+    "account_opened": "Activada",
+    "period_col": "Periodo",
     "no_account_hint": "Miembro antiguo sin cuenta de acceso; solo funcionan las claves que creaste para él. Elimínalo y vuelve a añadirlo para habilitar el acceso."
   },
   "setup": {

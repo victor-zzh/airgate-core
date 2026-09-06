@@ -151,7 +151,8 @@
 
 .ag-distribution-table-scroll {
   min-width: 0;
-  max-height: 11rem;
+  /* 原来 11rem 只放得下四行半,第五、六行被裁掉一半;放到 20rem 约九行整行可见,更多再滚 */
+  max-height: 20rem;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-gutter: stable;
