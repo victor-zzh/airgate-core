@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearch } from '@tanstack/react-router';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
@@ -11,7 +11,7 @@ import { usePagination } from '../../shared/hooks/usePagination';
 import { usePlatforms } from '../../shared/hooks/usePlatforms';
 import { useAuth } from '../../app/providers/AuthProvider';
 import { useToast } from '../../shared/ui';
-import { Activity, Hash, Coins, Clock, Download, Gauge, Percent, TriangleAlert, Upload, UsersRound } from 'lucide-react';
+import { Clock, Download, Gauge, Percent, Upload, UsersRound } from 'lucide-react';
 import type { UsageQuery } from '../../shared/types';
 import { useUsageColumns, fmtNum, type UsageColumnConfig, type UsageRow } from '../../shared/columns/usageColumns';
 import { getSessionAPIKey } from '../../shared/api/client';
@@ -26,40 +26,6 @@ import { USER_AUTO_REFRESH_OPTIONS, usePersistentAutoRefresh } from '../../share
 
 const USER_USAGE_AUTO_UPDATE_STORAGE_KEY = 'airgate.user.usage.auto_update';
 
-function StatCard({
-  accentColor,
-  icon,
-  title,
-  value,
-}: {
-  accentColor: string;
-  icon: ReactNode;
-  title: string;
-  value: ReactNode;
-}) {
-  return (
-    <Card className="ag-dashboard-metric min-h-[72px] 2xl:min-h-[78px]">
-      <Card.Content className="ag-dashboard-metric-content p-3 2xl:p-3.5">
-        <div className="ag-dashboard-metric-copy">
-          <div className="truncate text-sm font-semibold tracking-normal text-text-tertiary">{title}</div>
-          <div className="mt-1 flex min-w-0 items-baseline gap-2">
-            <div className="min-w-0 truncate font-mono text-[22px] font-semibold leading-none text-text 2xl:text-2xl">{value}</div>
-          </div>
-        </div>
-        <div
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--field-radius)] ring-1 shadow-sm 2xl:h-11 2xl:w-11"
-          style={{
-            background: `color-mix(in srgb, ${accentColor} 14%, transparent)`,
-            color: accentColor,
-            borderColor: `color-mix(in srgb, ${accentColor} 24%, transparent)`,
-          }}
-        >
-          {icon}
-        </div>
-      </Card.Content>
-    </Card>
-  );
-}
 
 function APIKeyInfoBar() {
   const { t } = useTranslation();
@@ -451,36 +417,20 @@ export default function UserUsageContent() {
       {/* API Key 登录信息 */}
       <APIKeyInfoBar />
 
-      {/* 概览统计 */}
-      <div className="mb-6 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4 2xl:gap-4">
-        <StatCard
-          title={t('usage.total_requests')}
-          value={(stats?.total_requests ?? 0).toLocaleString()}
-          icon={<Activity className="w-5 h-5" />}
-          accentColor="var(--ag-primary)"
-        />
-        <StatCard
-          title={t('usage.total_tokens')}
-          value={fmtNum(stats?.total_tokens ?? 0)}
-          icon={<Hash className="w-5 h-5" />}
-          accentColor="var(--ag-info)"
-        />
-        <StatCard
-          title={t('usage.actual_cost')}
-          value={<CostValue value={visibleActualCost} decimals={4} tone="actual" />}
-          icon={<Coins className="w-5 h-5" />}
-          accentColor="var(--ag-warning)"
-        />
-        <StatCard
-          title={t('usage.failed_requests', 'Failed requests')}
-          value={(stats?.failed_requests ?? 0).toLocaleString()}
-          icon={<TriangleAlert className="w-5 h-5" />}
-          accentColor="var(--ag-danger)"
-        />
-      </div>
+      {/* 概览摘要:客户侧只给请求数 / Token / 费用一行,不放失败数(仍可按结果筛选) */}
+      <p className="ag-usage-summary">
+        <span>{t('usage.total_requests')}</span>
+        <b>{(stats?.total_requests ?? 0).toLocaleString()}</b>
+        <span aria-hidden="true" className="ag-usage-summary-sep">·</span>
+        <span>{t('usage.total_tokens')}</span>
+        <b>{fmtNum(stats?.total_tokens ?? 0)}</b>
+        <span aria-hidden="true" className="ag-usage-summary-sep">·</span>
+        <span>{t('usage.actual_cost')}</span>
+        <b><CostValue value={visibleActualCost} decimals={4} tone="actual" /></b>
+      </p>
 
       {/* 筛选栏 */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-5 flex-wrap">
+      <div className="ag-filter-bar flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-5 flex-wrap">
         <div className="w-full sm:w-auto">
           <UsageDateRangeFilter
             clearLabel={t('common.clear')}

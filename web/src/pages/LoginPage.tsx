@@ -24,6 +24,8 @@ import {
 } from '../shared/api/client';
 import { consumeAuthReturnTo } from '../shared/authReturnTo';
 import { SiteBrand } from '../shared/components/SiteBrand';
+import { LoginHero } from './login/LoginHero';
+import { useCurrentBrand } from '../shared/brand';
 import { markNewRegistration } from '../shared/onboarding/storage';
 import { Mail, Lock, User, ArrowRight, Sun, Moon, ShieldCheck, Layers, Gauge, BarChart3, BadgeCheck } from 'lucide-react';
 
@@ -759,6 +761,10 @@ export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const site = useSiteSettings();
+  const brand = useCurrentBrand();
+  // HopBase 品牌:左半镜像官网首屏的 quickstart 终端面板;ToC 等其它品牌沿用各自的装饰面板
+  const hopbaseHero = brand === 'hopbase';
+  const heroBaseUrl = site.api_base_url || window.location.origin;
   const [activeTab, setActiveTab] = useState<TabKey>('login');
   const [oauthError, setOauthError] = useState('');
   const [oauthLoading, setOauthLoading] = useState(false);
@@ -880,7 +886,10 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex relative overflow-hidden bg-bg-deep text-text">
-      {/* ===== 左侧装饰面板（桌面端） ===== */}
+      {/* ===== 左侧面板（桌面端）:HopBase 品牌为终端面板,其它品牌为装饰面板 ===== */}
+      {hopbaseHero ? (
+        <LoginHero baseUrl={heroBaseUrl} className="hidden lg:flex lg:w-[45%] xl:w-[50%]" />
+      ) : (
       <div
         className="hidden lg:flex lg:w-[45%] xl:w-[50%] relative items-center justify-center overflow-hidden"
         style={{
@@ -949,9 +958,10 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* ===== 右侧表单区 ===== */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 bg-bg-deep relative overflow-hidden">
+      <div className="ag-login-form-side flex-1 flex items-center justify-center p-6 sm:p-8 bg-bg-deep relative overflow-hidden">
         {/* 表单区背景：卡片上方一团极淡的柔光，避免整面死黑/死白 */}
         <div
           className="pointer-events-none absolute left-1/2 top-[12%] h-[420px] w-[560px] -translate-x-1/2 rounded-full blur-3xl"
@@ -1006,19 +1016,18 @@ export default function LoginPage() {
 
           {/* Tab 切换 */}
           <Tabs
-            className="mb-6 w-full"
+            className="ag-page-tabs ag-login-tabs mb-6 w-full"
             selectedKey={activeTab}
             onSelectionChange={(key) => {
               const nextTab = key as TabKey;
               if (nextTab !== activeTab) cancelActiveAuthenticationAttempt();
               setActiveTab(nextTab);
             }}
-            variant="secondary"
           >
             <Tabs.List className="w-full">
-              <Tabs.Tab id="login">{t('common.login')}</Tabs.Tab>
+              <Tabs.Tab id="login"><Tabs.Indicator />{t('common.login')}</Tabs.Tab>
               {site.registration_enabled ? (
-                <Tabs.Tab id="register">{t('common.register')}</Tabs.Tab>
+                <Tabs.Tab id="register"><Tabs.Indicator />{t('common.register')}</Tabs.Tab>
               ) : null}
             </Tabs.List>
           </Tabs>

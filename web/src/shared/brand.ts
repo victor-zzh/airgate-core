@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from 'react';
 // 品牌判定:同一套控制台服务 HopBase(ToB)与 Essevin / kite 等 ToC 品牌。
 // 视觉皮肤(styles/brand-hopbase.css)只对 <html data-brand="hopbase"> 生效,
 // 因此这里集中决定「当前是哪个品牌」,并把结果写到 <html> 与 localStorage:
@@ -101,4 +102,13 @@ export function applyBrand(brand: BrandId | null): void {
 export function applyProvisionalBrand(): void {
   if (typeof window === 'undefined') return;
   applyBrand(provisionalBrand(window.location.hostname, getStoredBrand()));
+}
+
+function getServerBrand(): BrandId | null {
+  return null;
+}
+
+/** 当前品牌(随 applyBrand 变化重渲染);登录页等未进壳层的页面用它决定品牌化布局 */
+export function useCurrentBrand(): BrandId | null {
+  return useSyncExternalStore(subscribeBrand, getCurrentBrand, getServerBrand);
 }

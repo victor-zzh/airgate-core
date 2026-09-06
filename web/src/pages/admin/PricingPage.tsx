@@ -64,7 +64,7 @@ export default function PricingPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold text-text">{t('pricing.title', '价格管理')}</h1>
+        <h1 className="ag-page-title ag-page-title--inline">{t('pricing.title', '价格管理')}</h1>
         <p className="mt-1 text-sm text-text-secondary">
           {t('pricing.subtitle', '每个分组的标准价、成本与毛利，以及享受专属价的客户。折 = 倍率 ÷ 汇率，全站统一口径。')}
         </p>

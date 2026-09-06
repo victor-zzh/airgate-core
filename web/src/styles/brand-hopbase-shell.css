@@ -250,15 +250,20 @@
 
 /* ---------- 指标:一张发丝线网格,不做浮起的卡片 ---------- */
 [data-brand="hopbase"] .ag-stats-grid {
-  gap: 1px !important;
+  gap: 0 !important;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--console-radius-lg);
-  background: var(--separator);
+  background: var(--surface);
 }
 
+/* 发丝线画在每个格子的右 / 下边,用 -1px 外边距让最外一圈压进容器边框;
+   格数不满整行时空位只是纸面,不会露出一块灰底 */
 [data-brand="hopbase"] .ag-stats-grid .ag-dashboard-metric {
+  margin: 0 -1px -1px 0;
   border: 0;
+  border-right: 1px solid var(--separator);
+  border-bottom: 1px solid var(--separator);
   border-radius: 0;
   background: var(--surface);
   box-shadow: none;
