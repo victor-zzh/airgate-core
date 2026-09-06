@@ -1721,6 +1721,9 @@
     "groups_all": "全部分組",
     "groups_count": "{{count}} 個分組",
     "no_account": "未開通登入帳號",
+    "account_col": "登入帳號",
+    "account_opened": "已開通",
+    "period_col": "週期",
     "no_account_hint": "舊版成員沒有登入帳號，只能用您代建的密鑰；如需登入請刪除後重新新增"
   },
   "setup": {

@@ -244,7 +244,9 @@ export default function TeamPage() {
         <CommonTable.Header>
           <CommonTable.Column id="name">{t('team.name')}</CommonTable.Column>
           <CommonTable.Column id="status">{t('common.status')}</CommonTable.Column>
-          <CommonTable.Column id="quota" style={{ width: '18rem' }}>{t('team.quota_label')}</CommonTable.Column>
+          <CommonTable.Column id="account" style={{ width: '7rem' }}>{t('team.account_col', '登录账号')}</CommonTable.Column>
+          <CommonTable.Column id="quota" style={{ width: '15rem' }}>{t('team.quota_label')}</CommonTable.Column>
+          <CommonTable.Column id="period" style={{ width: '9rem' }}>{t('team.period_col', '周期')}</CommonTable.Column>
           <CommonTable.Column id="groups" style={{ width: '8rem' }}>{t('team.groups')}</CommonTable.Column>
           <CommonTable.Column id="usage" style={{ width: '11.5rem' }}>{t('api_keys.usage')}</CommonTable.Column>
           <CommonTable.Column id="keys" style={{ width: '9rem' }}>{t('team.keys')}</CommonTable.Column>
@@ -252,10 +254,10 @@ export default function TeamPage() {
         </CommonTable.Header>
         <CommonTable.Body>
           {isLoading ? (
-            <TableLoadingRow colSpan={7} />
+            <TableLoadingRow colSpan={9} />
           ) : rows.length === 0 ? (
             <CommonTable.Row id="empty">
-              <CommonTable.Cell colSpan={7}>
+              <CommonTable.Cell colSpan={9}>
                 <EmptyState>
                   <div className="text-sm text-default-500">{t('team.empty_hint')}</div>
                 </EmptyState>
@@ -273,9 +275,6 @@ export default function TeamPage() {
                       {row.email ? (
                         <div className="truncate text-xs text-text-tertiary" title={row.email}>{row.email}</div>
                       ) : null}
-                      {!row.has_account ? (
-                        <span className="ag-member-tag" title={t('team.no_account_hint')}>{t('team.no_account')}</span>
-                      ) : null}
                       {row.note ? (
                         <div className="truncate text-xs text-text-tertiary" title={row.note}>{row.note}</div>
                       ) : null}
@@ -283,6 +282,13 @@ export default function TeamPage() {
                   </CommonTable.Cell>
                   <CommonTable.Cell>
                     <StatusChip status={row.status} />
+                  </CommonTable.Cell>
+                  <CommonTable.Cell>
+                    {row.has_account ? (
+                      <span className="text-xs text-text-secondary">{t('team.account_opened', '已开通')}</span>
+                    ) : (
+                      <span className="text-xs text-warning" title={t('team.no_account_hint')}>{t('team.no_account')}</span>
+                    )}
                   </CommonTable.Cell>
                   <CommonTable.Cell>
                     {/* 额度:一行「已用 / 总额」+ 细进度条 + 周期说明,替代两枚彩色徽记 */}
@@ -296,12 +302,14 @@ export default function TeamPage() {
                           <i data-tone={pct >= 90 ? 'danger' : pct >= 70 ? 'warning' : undefined} style={{ width: `${pct}%` }} />
                         </div>
                       ) : null}
-                      <div className="ag-quota-cell-meta">
-                        {row.quota_period === 'monthly'
-                          ? t('team.period_ends', { date: formatDate(row.period_end) })
-                          : t('team.period_none')}
-                      </div>
                     </div>
+                  </CommonTable.Cell>
+                  <CommonTable.Cell>
+                    <span className="text-xs text-text-secondary">
+                      {row.quota_period === 'monthly'
+                        ? t('team.period_ends', { date: formatDate(row.period_end) })
+                        : t('team.period_none')}
+                    </span>
                   </CommonTable.Cell>
                   <CommonTable.Cell>
                     <span className="text-sm text-text-secondary">

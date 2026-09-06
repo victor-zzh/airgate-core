@@ -1721,6 +1721,9 @@
     "groups_all": "すべてのグループ",
     "groups_count": "{{count}} グループ",
     "no_account": "ログインアカウント未開設",
+    "account_col": "ログインアカウント",
+    "account_opened": "開通済み",
+    "period_col": "周期",
     "no_account_hint": "旧仕様のメンバーにはログインアカウントがなく、あなたが代理作成したキーのみ使えます。ログインが必要なら削除して再追加してください"
   },
   "setup": {
