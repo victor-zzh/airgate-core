@@ -215,7 +215,7 @@ export default function GroupsPage() {
                         ) : (
                           <Text className="h-3.5 w-3.5 shrink-0" style={{ color: 'var(--ag-text-tertiary)' }} />
                         )}
-                        <span style={{ color: 'var(--ag-text)' }} className="truncate font-medium">
+                        <span style={{ color: 'var(--ag-text)' }} className="ag-cell-2line font-medium">
                           {row.name}
                         </span>
                       </span>

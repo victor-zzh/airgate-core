@@ -883,3 +883,14 @@
     transform: translateX(100%);
   }
 }
+
+/* 表格单元格里的两行折行:替代一行省略号,长名字(账号名 / 平台名)不再被截成「xxx-…」 */
+.ag-cell-2line {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
+}

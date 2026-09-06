@@ -412,7 +412,7 @@ export default function ReferralPage() {
                   <CommonTable.Cell>
                     <div className="flex min-w-0 flex-col">
                       <div className="flex min-w-0 items-center gap-1.5">
-                        <span className="truncate font-medium" style={{ color: 'var(--ag-text)' }}>{row.email}</span>
+                        <span className="ag-cell-2line font-medium" style={{ color: 'var(--ag-text)' }}>{row.email}</span>
                         {row.tier === 'official' ? (
                           <span
                             className="shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium"
