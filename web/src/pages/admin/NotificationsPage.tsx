@@ -248,11 +248,6 @@ export default function NotificationsPage() {
 
   return (
     <div className="ag-page">
-      <div className="ag-page-header">
-        <h1 className="ag-page-title">{t('notifications.title')}</h1>
-        <p className="ag-page-subtitle">{t('notifications.description')}</p>
-      </div>
-
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.9fr)]">
         <Card>
           <Card.Header>
@@ -263,6 +258,7 @@ export default function NotificationsPage() {
             <form className="space-y-5" onSubmit={publish}>
               <Field label={t('notifications.field_title')} hint={t('notifications.field_title_hint')}>
                 <Input
+                  className="w-full"
                   maxLength={120}
                   value={draftTitle}
                   onChange={(event) => setDraftTitle(event.target.value)}
@@ -292,10 +288,13 @@ export default function NotificationsPage() {
                     return (
                       <Button
                         key={level}
+                        aria-pressed={draftLevel === level}
+                        className="ag-level-option"
+                        data-selected={draftLevel === level}
                         fullWidth
                         size="sm"
                         type="button"
-                        variant={draftLevel === level ? 'primary' : 'secondary'}
+                        variant="ghost"
                         onPress={() => setDraftLevel(level)}
                       >
                         <Icon className="h-4 w-4" />
@@ -359,7 +358,7 @@ export default function NotificationsPage() {
               </div>
             )}
 
-            <div className="max-h-[620px] overflow-y-auto">
+            <div className="ag-notice-history max-h-[560px] overflow-y-auto">
               {history.length === 0 ? (
                 <div className="flex min-h-56 flex-col items-center justify-center gap-3 px-6 py-10 text-center">
                   <BellRing className="h-8 w-8 text-text-tertiary" />

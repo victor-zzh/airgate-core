@@ -54,7 +54,45 @@ import {
   Link2,
   UsersRound,
   ChevronsUpDown,
+  Palette,
+  MessageSquare,
+  Wallet,
+  History,
+  Receipt,
+  Activity,
+  Image as ImageIcon,
+  Video,
+  Store,
+  LayoutGrid,
 } from 'lucide-react';
+
+/**
+ * 插件页图标:插件在 metadata 里声明 icon 名(palette / wallet / message-square …),
+ * 这里映射到 lucide 组件;认不出的才回落拼图,不再让所有插件页长得一样。
+ */
+const PLUGIN_ICONS: Record<string, ReactNode> = {
+  palette: <Palette className="h-5 w-5" />,
+  'message-square': <MessageSquare className="h-5 w-5" />,
+  wallet: <Wallet className="h-5 w-5" />,
+  history: <History className="h-5 w-5" />,
+  receipt: <Receipt className="h-5 w-5" />,
+  settings: <Settings className="h-5 w-5" />,
+  gift: <Gift className="h-5 w-5" />,
+  activity: <Activity className="h-5 w-5" />,
+  image: <ImageIcon className="h-5 w-5" />,
+  video: <Video className="h-5 w-5" />,
+  store: <Store className="h-5 w-5" />,
+  grid: <LayoutGrid className="h-5 w-5" />,
+  bell: <Bell className="h-5 w-5" />,
+  users: <Users className="h-5 w-5" />,
+  key: <KeyRound className="h-5 w-5" />,
+  chart: <ChartNoAxesCombined className="h-5 w-5" />,
+};
+
+function pluginPageIcon(name: string | undefined): ReactNode {
+  const key = (name ?? '').trim().toLowerCase();
+  return PLUGIN_ICONS[key] ?? <Puzzle className="h-5 w-5" />;
+}
 
 interface AppShellProps {
   children: ReactNode;
@@ -159,7 +197,7 @@ function usePluginMenuItems(isAdmin: boolean, isAPIKeySession: boolean): {
         const item: MenuItem = {
           path: pluginPagePath(p.name, page.path),
           labelKey: page.title,
-          icon: <Puzzle className="h-5 w-5" />,
+          icon: pluginPageIcon(page.icon),
         };
 
         if (showInAdmin) {
