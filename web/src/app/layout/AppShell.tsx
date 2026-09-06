@@ -274,6 +274,17 @@ export function AppShell({ children }: AppShellProps) {
     { id: 'docs', label: t('nav.docs'), icon: <BookOpen className="h-3.5 w-3.5" /> },
     { id: 'logout', label: t('common.logout'), icon: <LogOut className="h-3.5 w-3.5" /> },
   ];
+  // 标题行:页面名独占一行,取自当前导航项;自带标题或全出血的页面(模型广场 / 生成监控 / 价格 / 插件页 / 博客编辑器)不重复渲染
+  const pageTitle = useMemo(() => {
+    if (/^\/(plugins|models|admin\/generation-tasks|admin\/pricing|admin\/blog\/edit)(\/|$)/.test(routerPath)) return null;
+    const items = sections.flatMap((section) => section.items);
+    const exact = items.find((item) => item.path === routerPath);
+    const nested = items
+      .filter((item) => item.path !== '/' && routerPath.startsWith(`${item.path}/`))
+      .sort((a, b) => b.path.length - a.path.length)[0];
+    const item = exact ?? nested;
+    return item ? t(item.labelKey) : null;
+  }, [routerPath, sections, t]);
   const notificationIdentity = isAPIKeySession
     ? `api-key:${user?.api_key_id ?? 'session'}`
     : `user:${user?.id ?? 'session'}`;
@@ -523,6 +534,7 @@ export function AppShell({ children }: AppShellProps) {
         <main className="min-h-0 flex-1 overflow-auto bg-bg pt-12 ag-main">
           <div className="ag-main-content mx-auto w-full max-w-[1920px] p-4 md:p-6 2xl:p-8">
             <AnnouncementBanner className="mb-4" />
+            {pageTitle ? <h1 className="ag-page-title">{pageTitle}</h1> : null}
             {children}
           </div>
         </main>

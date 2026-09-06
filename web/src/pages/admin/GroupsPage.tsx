@@ -108,7 +108,7 @@ export default function GroupsPage() {
   return (
     <div>
       {/* 筛选 */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-5 flex-wrap">
+      <div className="ag-filter-bar flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-5 flex-wrap">
         <div className="w-full sm:w-48">
           <Select
             fullWidth

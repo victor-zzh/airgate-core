@@ -123,7 +123,7 @@ export default function UsersPage() {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-5 flex-wrap">
+      <div className="ag-filter-bar flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-5 flex-wrap">
         <div className="w-full sm:w-48">
           <HeroTextField fullWidth aria-label={t('users.search_placeholder')}>
             <div className="relative">

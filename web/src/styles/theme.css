@@ -218,3 +218,21 @@
   --shadow-lg: var(--overlay-shadow);
   --shadow-glow: var(--ag-shadow-glow);
 }
+
+/* 图表调色板默认值(饼图十色 + Token 指标色);品牌层用 :root[data-brand] 覆盖,图表代码只认 var(--chart-*) */
+:root {
+  --chart-1: oklch(64% 0.105 253.83);
+  --chart-2: oklch(66% 0.095 156);
+  --chart-3: oklch(72% 0.105 76);
+  --chart-4: oklch(65% 0.1 24);
+  --chart-5: oklch(65% 0.095 298);
+  --chart-6: oklch(68% 0.085 205);
+  --chart-7: oklch(67% 0.09 338);
+  --chart-8: oklch(62% 0.075 262);
+  --chart-9: oklch(70% 0.085 124);
+  --chart-10: oklch(66% 0.085 48);
+  --chart-token-input: #10b981;
+  --chart-token-output: #0ea5e9;
+  --chart-token-cache-creation: #f59e0b;
+  --chart-token-cache-ratio: #c084fc;
+}

@@ -140,3 +140,14 @@
   }
 
 }
+
+/* 模型 / 操作列:名字最多两行(40px 行高放得下),超出再省略;任意位置可断行避免撑宽 */
+.ag-usage-model-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}

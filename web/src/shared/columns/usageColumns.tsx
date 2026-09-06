@@ -152,6 +152,31 @@ export const ERROR_CODE_META: Record<string, { labelKey: string; tone: 'danger' 
   request_timeout: { labelKey: 'usage.error_request_timeout', tone: 'danger' },
 };
 
+/**
+ * 客户侧(非管理员视图)对服务侧故障统一给中性文案,不露上游 / 调度 / 账号等内部架构词,
+ * 并隐藏错误码与错误原文;客户端类错误(参数错、余额不足、并发超限、已取消)保留原样。
+ */
+const CUSTOMER_NEUTRAL_ERROR_LABEL: Record<string, string> = {
+  account_rate_limited: 'usage.error_customer_busy',
+  all_routes_rate_limited: 'usage.error_customer_busy',
+  account_dead: 'usage.error_customer_busy',
+  no_available_account: 'usage.error_customer_busy',
+  no_available_route: 'usage.error_customer_busy',
+  upstream_transient: 'usage.error_customer_busy',
+  upstream_error: 'usage.error_customer_busy',
+  all_routes_failed: 'usage.error_customer_busy',
+  plugin_error: 'usage.error_customer_busy',
+  plugin_unavailable: 'usage.error_customer_busy',
+  metadata_scope_failed: 'usage.error_customer_busy',
+  upstream_timeout: 'usage.error_customer_timeout',
+  request_timeout: 'usage.error_customer_timeout',
+  stream_aborted: 'usage.error_customer_interrupted',
+};
+
+export function customerNeutralErrorLabelKey(code: string | undefined): string | undefined {
+  return code ? CUSTOMER_NEUTRAL_ERROR_LABEL[code] : undefined;
+}
+
 /** 本行是否是一次失败请求。判据是 error_code：被上游计了费的 4xx 仍是计费行，但同样算失败。 */
 export function isFailedUsageRow(row: UsageRow): boolean {
   return !!row.error_code;
@@ -200,8 +225,9 @@ function errorToneColor(tone: 'danger' | 'warning'): string {
 function ErrorDetail({ adminView, row, t }: { adminView: boolean; row: UsageRow; t: TFunction }) {
   const code = row.error_code ?? '';
   const meta = ERROR_CODE_META[code];
-  const label = meta ? t(meta.labelKey, code) : code;
-  const message = row.error_message?.trim();
+  const neutralKey = adminView ? undefined : customerNeutralErrorLabelKey(code);
+  const label = neutralKey ? t(neutralKey) : (meta ? t(meta.labelKey, code) : code);
+  const message = neutralKey ? '' : row.error_message?.trim();
   const adminRow = adminView ? row as UsageLogResp : null;
   const traceID = row.usage_metadata?.trace_id?.trim();
   const apiKey = adminRow
@@ -218,7 +244,7 @@ function ErrorDetail({ adminView, row, t }: { adminView: boolean; row: UsageRow;
   return (
     <TooltipPanel title={t('usage.error_detail', 'Failure details')} subtitle={[row.platform, model].filter(Boolean).join(' / ')}>
       <TooltipRow label={t('usage.error_type', 'Type')} value={label} tone={meta?.tone === 'danger' ? 'warning' : 'accent'} />
-      <TooltipRow label={t('usage.error_code', 'Error code')} value={code || '-'} tone="strong" />
+      {neutralKey ? null : <TooltipRow label={t('usage.error_code', 'Error code')} value={code || '-'} tone="strong" />}
       {row.error_status ? (
         <TooltipRow label={t('usage.error_status', 'HTTP status')} value={row.error_status} tone="strong" />
       ) : null}
@@ -278,7 +304,7 @@ const META_CHIP_EFFORT_COLORS: Record<string, string> = {
   xhigh: META_CHIP_XHIGH_COLOR,
 };
 
-const MODEL_META_SLOT_WIDTH_CLASS = 'w-[5.5rem]';
+const MODEL_META_SLOT_WIDTH_CLASS = 'w-[4.5rem]';
 
 function MetaChip({
   color,
@@ -754,7 +780,7 @@ export function useUsageColumns(opts?: { customerScope?: boolean; adminView?: bo
     {
       key: 'model',
       title: t('usage.model_or_operation', 'Model / Operation'),
-      width: '220px',
+      width: '240px',
       render: (row) => {
         const assetOperation = isAssetUsageOperation(row);
         const model = resolvedUsageModel(row);
@@ -802,7 +828,7 @@ export function useUsageColumns(opts?: { customerScope?: boolean; adminView?: bo
         })();
 
         return (
-          <div className="grid w-full min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-2 text-left">
+          <div className="grid w-full min-w-0 grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-3 text-left">
             <div className={`ag-usage-model-meta-slot ${MODEL_META_SLOT_WIDTH_CLASS} flex h-4 shrink-0 items-center justify-center overflow-hidden`}>
               {PluginUsageModelMeta ? (
                 <PluginUsageModelMeta
@@ -811,7 +837,8 @@ export function useUsageColumns(opts?: { customerScope?: boolean; adminView?: bo
                 />
               ) : fallbackMeta}
             </div>
-            <span className="min-w-0 truncate text-sm font-medium leading-none text-text" title={model}>
+            {/* 长模型名(如带日期与后缀的 claude 型号)允许折成两行,不再一行截断;完整名仍在 title 里 */}
+            <span className="ag-usage-model-name min-w-0 text-[12.5px] font-medium text-text" title={model}>
               {model}
             </span>
           </div>

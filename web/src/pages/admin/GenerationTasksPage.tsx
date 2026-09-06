@@ -410,13 +410,13 @@ export default function GenerationTasksPage() {
   return (
     <div className="space-y-5">
       <div className="flex min-h-8 items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold text-text">{t('generation_tasks.title')}</h1>
+        <h1 className="ag-page-title ag-page-title--inline">{t('generation_tasks.title')}</h1>
         <Chip color={healthy ? 'success' : 'warning'} size="sm" variant="soft">
           {t(healthy ? 'generation_tasks.health_normal' : 'generation_tasks.health_attention')}
         </Chip>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="ag-stats-grid grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           accent={healthy ? 'var(--ag-success)' : 'var(--ag-warning)'}
           detail={summary?.queued

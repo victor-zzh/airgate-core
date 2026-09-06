@@ -733,7 +733,7 @@ export default function UsagePage() {
       {/* 聚合统计 */}
       {activeStats && (
         <div className="mb-6 space-y-4">
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5 2xl:gap-4">
+          <div className="ag-stats-grid grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-5 2xl:gap-4">
             <StatCard
               title={t('usage.total_requests')}
               value={activeStats.total_requests.toLocaleString()}
@@ -797,7 +797,7 @@ export default function UsagePage() {
       )}
 
       {/* 筛选栏 */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-5 flex-wrap">
+      <div className="ag-filter-bar flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-5 flex-wrap">
         <div className="w-full sm:w-auto">
           <UsageDateRangeFilter
             clearLabel={t('common.clear')}
